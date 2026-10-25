@@ -1,0 +1,271 @@
+/* Sandy — русский. Ключи — английский текст, поэтому строка без перевода
+   просто останется английской, а не превратится в идентификатор. */
+
+/* Вкладки */
+"Music" = "Музыка";
+"Show History File" = "Показать файл истории";
+"Move the previous history file aside, then Retry. Current sessions will be kept." = "Переместите прежний файл истории в резервную копию и нажмите «Повторить». Текущие сессии сохранятся.";
+"Shelf" = "Полка";
+"Clipboard" = "Буфер";
+"Snippets" = "Заготовки";
+"Calendar" = "Календарь";
+"Translate" = "Перевод";
+"Currency" = "Валюта";
+"Settings" = "Настройки";
+
+/* Меню-бар */
+"Open Panel" = "Открыть панель";
+"Quit" = "Выйти";
+
+/* Вкладка настроек */
+"General" = "Общее";
+"Launch at Login" = "Запускать при входе";
+"Show Menu Bar Icon" = "Показывать иконку в меню-баре";
+"Show in Panel" = "Показывать в панели";
+"Displays" = "Дисплеи";
+"Show on All Displays" = "Показывать на всех дисплеях";
+"Full-Height Notch Without a Cutout" = "Высокая чёлка на экранах без выреза";
+
+"Screenshots" = "Скриншоты";
+"Save Clipboard Screenshots" = "Сохранять скриншоты из буфера";
+"Watch Screenshots Folder" = "Отслеживать папку снимков";
+"Choose Screenshots Folder" = "Выбор папки для снимков";
+"Sandy will watch this folder for new screenshots and add them to the shelf." = "Sandy будет следить за этой папкой и класть новые снимки на полку.";
+"Watch" = "Следить";
+"Show Screenshots Folder" = "Показать папку скриншотов";
+"Clear Screenshots Folder" = "Очистить папку снимков";
+"Clear Screenshots Folder (%@)" = "Очистить папку снимков (%@)";
+"Show Snippets File" = "Показать файл заготовок";
+
+"Configuration" = "Конфигурация";
+"Show Config File" = "Показать файл конфигурации";
+"config.json is broken — click to open; nothing is overwritten" = "config.json не читается — нажми, чтобы открыть; поверх ничего не пишется";
+
+"Sandy" = "Sandy";
+"Quit Sandy" = "Выйти из Sandy";
+
+/* Полка */
+"Selected: %d" = "Выбрано: %d";
+"Deselect" = "Снять выбор";
+"Clear" = "Очистить";
+"Copy" = "Копировать";
+"Open" = "Открыть";
+"Show in Finder" = "Показать в Finder";
+"Remove from Shelf" = "Убрать с полки";
+
+/* Музыка */
+"Nothing is playing" = "Ничего не играет";
+
+/* Заготовки */
+"Add a snippet" = "Добавить заготовку";
+"Name" = "Название";
+"Text" = "Текст";
+"Delete" = "Удалить";
+"Nothing here yet — add with +" = "Пока пусто — добавь через +";
+"snippets.json is broken — click to open; nothing is overwritten" = "snippets.json не читается — нажми, чтобы открыть; поверх ничего не пишется";
+
+/* Заметки */
+"Notes" = "Заметки";
+"New Note" = "Новая заметка";
+"Empty note" = "Пустая заметка";
+"Jot something down…" = "Набросай что-нибудь…";
+
+/* Перевод */
+"Translation Languages…" = "Языки перевода…";
+"Retry" = "Повторить";
+"The %@ → %@ language pack is not installed." = "Не скачан языковой пакет %@ → %@.";
+"macOS does not translate this pair of languages." = "macOS не переводит эту пару языков.";
+
+/* Валюта */
+"Search currency" = "Поиск валюты";
+"Swap currencies" = "Поменять валюты";
+"No currencies match" = "Ничего не найдено";
+
+/* Календарь */
+"Join" = "Подключиться";
+"Join · %@" = "Подключиться · %@";
+"No other meetings this week" = "Других встреч на неделе нет";
+"See your next meetings" = "Показать ближайшие встречи";
+"Sandy needs access to Calendar. It is the only permission\nthe app asks for, and only for this tab." = "Sandy нужен доступ к Календарю, чтобы показывать встречи.\nРазрешение запрашивается только для этой вкладки.";
+"Continue" = "Продолжить";
+"Calendar access is off" = "Доступ к Календарю закрыт";
+"Settings → Privacy → Calendars" = "Настройки → Конфиденциальность → Календари";
+"No more meetings" = "Встреч больше нет";
+"Nothing on the calendar for the next day" = "В ближайшие сутки календарь пуст";
+"Untitled" = "Без названия";
+"Calendars" = "Календари";
+"Done" = "Готово";
+
+/* Отсчёт со строчной: прописную ставит то место, где строится подпись.
+   Сокращения намеренные: в шапку панели помещается «через 12 мин», но
+   не полное слово с падежом, а сокращение не склоняется ни в каком языке. */
+"now" = "идёт сейчас";
+"any moment" = "вот-вот";
+"tomorrow" = "завтра";
+"in %d min" = "через %d мин";
+"in %d h" = "через %d ч";
+"in %d h %d min" = "через %d ч %d мин";
+"in %d d" = "через %d дн";
+
+/* Сохранённые снимки. Ключ — сам формат даты, чтобы язык мог переставить части
+   в своём порядке. */
+"Screenshot" = "Снимок";
+"yyyy-MM-dd 'at' HH.mm.ss" = "yyyy-MM-dd 'в' HH.mm.ss";
+
+/* Режим приватности: панель закрывает содержимое полем из точек. */
+"Hide Contents" = "Скрывать содержимое";
+"Hidden" = "Скрыто";
+"Show" = "Показать";
+"Hide" = "Скрыть";
+"All" = "Всё";
+
+"Teleprompter" = "Телесуфлёр";
+"Paste the script here" = "Вставьте сюда сценарий";
+"Ready" = "Готово";
+"Utilities" = "Утилиты";
+"Lock Keyboard" = "Заблокировать клавиатуру";
+"Wipe the keys and the screen. Hold Esc or − for %d s to\nunlock; it also unlocks by itself after a minute" = "Протри клавиши и экран. Чтобы разблокировать — держи Esc\nили − %d с; само снимется через минуту";
+"Allow in Settings" = "Разрешить в настройках";
+"Input is protected" = "Ввод защищён";
+"Could not take over input" = "Не удалось перехватить ввод";
+"Still unlocking" = "Ещё разблокируется";
+"Lock ended early" = "Блокировка прервалась";
+"An app turned on secure keyboard entry, so keys stopped\nreaching the lock. It ended instead of pretending" = "Приложение включило защищённый ввод, и нажатия перестали\nдоходить до блокировки. Она снялась, а не сделала вид";
+"The previous lock is still being taken down.\nPress again in a moment" = "Предыдущая блокировка ещё снимается.\nНажми снова через мгновение";
+"An app is holding secure keyboard entry — a password field,\na password manager, a terminal. Close it and press again" = "Какое-то приложение держит защищённый ввод — поле пароля,\nменеджер паролей, терминал. Закрой его и нажми снова";
+"The system refused the event tap. Re-granting Accessibility\nusually fixes it — the permission is tied to the app's signature" = "Система не дала перехват событий. Обычно помогает выдать\nУниверсальный доступ заново — он привязан к подписи сборки";
+"Sandy needs Accessibility to swallow keys and clicks.\nSystem Settings → Privacy & Security → Accessibility" = "Нужен Универсальный доступ, чтобы гасить нажатия и клики.\nНастройки → Конфиденциальность → Универсальный доступ";
+"Keyboard and trackpad are locked" = "Клавиатура и трекпад заблокированы";
+"Hold Esc or − for %d s" = "Держи Esc или − %d с";
+"Unlocks by itself in %d s" = "Само снимется через %d с";
+
+/* AI agent monitoring */
+"Agents" = "Агенты";
+"Agent Monitoring" = "Мониторинг агентов";
+"Monitoring" = "Мониторинг";
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Agent Notifications" = "Уведомления агентов";
+"Enable Notifications" = "Включить уведомления";
+"Install Claude Hooks" = "Установить хуки Claude";
+"Remove Claude Hooks" = "Удалить хуки Claude";
+"Monitor is off" = "Мониторинг выключен";
+"Starting agent monitor…" = "Запуск мониторинга агентов…";
+"Listening for agent events" = "Ожидание событий агентов";
+"Agent helper is missing. Rebuild Sandy with sandy-agent." = "Хелпер агентов не найден. Пересоберите Sandy с sandy-agent.";
+"Agent monitor disconnected. Retry to reconnect." = "Связь с монитором потеряна. Нажмите «Повторить» для подключения.";
+"Monitoring paused during sleep" = "Мониторинг приостановлен на время сна";
+"No sources selected" = "Не выбраны источники";
+"Could not update Claude hooks" = "Не удалось обновить хуки Claude";
+"Claude hooks installed" = "Хуки Claude установлены";
+"Claude hooks removed" = "Хуки Claude удалены";
+"Agent notifications are off" = "Уведомления агентов выключены";
+"Notifications allowed" = "Уведомления разрешены";
+"Notifications blocked in System Settings" = "Уведомления заблокированы в Системных настройках";
+"Notification permission was not granted" = "Разрешение на уведомления не получено";
+"Could not save agent history" = "Не удалось сохранить историю агентов";
+"Agent history could not be read. Existing file was preserved." = "Историю агентов не удалось прочитать. Существующий файл сохранён.";
+"Answer Ready" = "Ответ готов";
+"Your Input Is Needed" = "Нужен ваш ответ";
+"Agent Error" = "Ошибка агента";
+"Open Agent Session" = "Открыть сессию агента";
+"Sessions" = "Сессии";
+"Analytics" = "Аналитика";
+"Active: %d" = "Активных: %d";
+"Active Time" = "Активное время";
+"Operations" = "Операции";
+"Tokens · in %@ · out %@" = "Токены · вход %@ · выход %@";
+"No Data" = "Нет данных";
+"Sessions: %d" = "Сессий: %d";
+"Saved on this Mac" = "Сохранено на этом Mac";
+"Token counts are cumulative. Missing values are shown as No Data." = "Токены учитываются накопительно. Неизвестные значения отображаются как «Нет данных».";
+"No Agent Sessions Yet" = "Пока нет сессий агентов";
+"Start a supported Claude Code or Codex session. Events will appear here." = "Запустите поддерживаемую сессию Claude Code или Codex. Здесь появятся её события.";
+"Enable monitoring in Settings to see your agent sessions here." = "Включите мониторинг в настройках, чтобы видеть здесь сессии агентов.";
+"Unknown Project" = "Неизвестный проект";
+"Idle" = "Ожидание задачи";
+"Working" = "Работает";
+"Waiting for Input" = "Ждёт ответа";
+"Session Ended" = "Сессия завершена";
+"Disconnected" = "Связь потеряна";
+"Sandy asks for notification permission only when you enable this switch." = "Sandy запрашивает разрешение на уведомления только при включении этого переключателя.";
+"Claude hooks are installed only when you click Install. Your existing hooks are kept." = "Хуки Claude устанавливаются только по нажатию кнопки «Установить». Существующие хуки сохраняются.";
+"Updating Claude Hooks…" = "Обновление хуков Claude…";
+
+/* Agent operation labels, translated when displayed. */
+"Run Command" = "Запуск команды";
+"Run Code" = "Выполнение кода";
+"Read File" = "Чтение файла";
+"Write File" = "Запись файла";
+"Edit File" = "Правка файла";
+"Search Files" = "Поиск по файлам";
+"Fetch Page" = "Загрузка страницы";
+"Search Web" = "Поиск в интернете";
+"Subagent" = "Субагент";
+"Task Plan" = "План задач";
+"Ask User" = "Вопрос пользователю";
+"Compact Context" = "Сжатие контекста";
+"Turn Interrupted" = "Ход прерван";
+"Image Operation" = "Работа с изображением";
+
+/* Language and keyboard shortcut settings. */
+"Language" = "Язык";
+"System Language" = "Язык системы";
+"Enable Keyboard Shortcut" = "Включить горячие клавиши";
+"Keyboard Shortcut" = "Горячие клавиши";
+"Press the shortcut again or Esc to close." = "Нажмите сочетание повторно или Esc, чтобы закрыть панель.";
+"This shortcut is unavailable. Choose another combination." = "Сочетание недоступно. Выберите другое.";
+"Space" = "Пробел";
+
+/* New features: utilities timer, OCR, clipboard settings, meeting alerts, translation pair */
+"Timer" = "Таймер";
+"Time is up" = "Время вышло";
+"%d min" = "%d мин";
+"Keep Awake" = "Не давать уснуть";
+"Copy Text" = "Копировать текст";
+"Send to Teleprompter" = "В телесуфлёр";
+"Open in Terminal" = "Открыть в Terminal";
+"Keep History Between Launches" = "Хранить историю между запусками";
+"History Size" = "Размер истории";
+"Excluded Apps" = "Исключённые приложения";
+"Don't Save Copies from %@" = "Не сохранять копии из «%@»";
+"Meeting Reminders" = "Напоминания о встречах";
+"Before Start" = "До начала";
+"Upcoming Meeting" = "Скоро встреча";
+"Translate From" = "С какого языка";
+"Translate To" = "На какой язык";
+"Automatic" = "Авто";
+"Remove Only Listed Files" = "Удалять только файлы из списка";
+"Image" = "Изображение";
+"Quick Look" = "Быстрый просмотр";
+"Nothing Copied Yet" = "Пока ничего не скопировано";
+"Search" = "Поиск";
+
+/* Mobile access */
+"Phone Access" = "Доступ с телефона";
+"HTTPS relay URL" = "HTTPS-адрес ретранслятора";
+"Relay access key" = "Ключ доступа к ретранслятору";
+"Connect Phone Link" = "Подключить телефон";
+"Disconnect Phone Link" = "Отключить связь с телефоном";
+"Pair Phone" = "Сопрячь телефон";
+"Copy Pairing Code" = "Скопировать код сопряжения";
+"Pairing expires in two minutes. Keep this code private." = "Код действует две минуты. Не передавайте его посторонним.";
+"Compare the fingerprint on your phone before allowing it." = "Перед подтверждением сравните отпечаток с телефоном.";
+"Trust This Phone" = "Доверять этому телефону";
+"Revoke Phone" = "Отозвать доступ";
+"Install Mobile Approvals" = "Установить мобильные подтверждения";
+"Remove Mobile Approvals" = "Удалить мобильные подтверждения";
+"Could not load mobile keys" = "Не удалось загрузить ключи телефона";
+"Enter relay URL and access key" = "Введите адрес и ключ ретранслятора";
+"Mobile setup is invalid" = "Проверьте настройки мобильной связи";
+"Connecting to mobile relay…" = "Подключение к ретранслятору…";
+"Mobile link connected" = "Связь с телефоном подключена";
+"Mobile link disconnected; retrying" = "Связь потеряна; повторное подключение";
+"Could not create pairing" = "Не удалось начать сопряжение";
+"Could not save mobile keys" = "Не удалось сохранить ключи телефона";
+"Request expired or already resolved" = "Запрос истёк или уже обработан";
+"Allow Once" = "Разрешить один раз";
+"Deny" = "Отклонить";
+"Completion Glow" = "Свечение при завершении";
+"The notch lights up briefly when an agent finishes a response." = "Вырез ненадолго подсвечивается, когда агент заканчивает ответ.";
+"Open in Editor" = "Открыть в редакторе";

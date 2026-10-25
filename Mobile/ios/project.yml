@@ -1,0 +1,41 @@
+name: SandyPhone
+options:
+  bundleIdPrefix: com.abdirakhym.sandy
+packages:
+  Sandy:
+    path: ../..
+settings:
+  base:
+    SWIFT_VERSION: '6.0'
+    IPHONEOS_DEPLOYMENT_TARGET: '17.0'
+targets:
+  SandyPhone:
+    type: application
+    platform: iOS
+    deploymentTarget: '17.0'
+    sources: [SandyPhone]
+    dependencies:
+      - package: Sandy
+        product: SandyMobileCore
+      - target: SandyWidgets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abdirakhym.sandy.phone
+        CODE_SIGN_ENTITLEMENTS: SandyPhone/Phone.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: SandyPhone/Info.plist
+        TARGETED_DEVICE_FAMILY: '1,2'
+  SandyWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: '17.0'
+    sources:
+      - SandyWidgets
+      - SandyPhone/AgentActivityAttributes.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abdirakhym.sandy.phone.widgets
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: SandyWidgets/Info.plist
+        APPLICATION_EXTENSION_API_ONLY: YES

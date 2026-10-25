@@ -1,0 +1,34 @@
+services:
+  relay:
+    build: .
+    restart: unless-stopped
+    environment:
+      SANDY_RELAY_ADMIN_TOKEN: ${SANDY_RELAY_ADMIN_TOKEN:?Set a random 32-byte base64url token}
+      SANDY_RELAY_STATE_FILE: /data/relay.enc
+      APNS_KEY_FILE: ${APNS_KEY_FILE:-}
+      APNS_KEY_ID: ${APNS_KEY_ID:-}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:-}
+      APNS_TOPIC: ${APNS_TOPIC:-com.abdirakhym.sandy.phone}
+      APNS_SANDBOX: ${APNS_SANDBOX:-1}
+      FCM_KEY_FILE: ${FCM_KEY_FILE:-}
+    volumes:
+      - relay-data:/data
+      - ./secrets:/run/secrets:ro
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+  https:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      SANDY_RELAY_HOST: ${SANDY_RELAY_HOST:?Set your relay DNS hostname}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+volumes:
+  relay-data:
+  caddy-data:
+  caddy-config:

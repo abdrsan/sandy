@@ -1,0 +1,272 @@
+/* Sandy — English. The keys are the English text itself, so this table is a
+   formality: it exists so the bundle declares English as a localisation, and so
+   a phrase can be reworded here without touching the code. */
+
+/* Tabs */
+"Show History File" = "Show History File";
+"Move the previous history file aside, then Retry. Current sessions will be kept." = "Move the previous history file aside, then Retry. Current sessions will be kept.";
+"Music" = "Music";
+"Shelf" = "Shelf";
+"Clipboard" = "Clipboard";
+"Snippets" = "Snippets";
+"Calendar" = "Calendar";
+"Translate" = "Translate";
+"Currency" = "Currency";
+"Settings" = "Settings";
+
+/* Menu bar */
+"Open Panel" = "Open Panel";
+"Quit" = "Quit";
+
+/* Settings tab */
+"General" = "General";
+"Launch at Login" = "Launch at Login";
+"Show Menu Bar Icon" = "Show Menu Bar Icon";
+"Show in Panel" = "Show in Panel";
+"Displays" = "Displays";
+"Show on All Displays" = "Show on All Displays";
+"Full-Height Notch Without a Cutout" = "Full-Height Notch Without a Cutout";
+
+"Screenshots" = "Screenshots";
+"Save Clipboard Screenshots" = "Save Clipboard Screenshots";
+"Watch Screenshots Folder" = "Watch Screenshots Folder";
+"Choose Screenshots Folder" = "Choose Screenshots Folder";
+"Sandy will watch this folder for new screenshots and add them to the shelf." = "Sandy will watch this folder for new screenshots and add them to the shelf.";
+"Watch" = "Watch";
+"Show Screenshots Folder" = "Show Screenshots Folder";
+"Clear Screenshots Folder" = "Clear Screenshots Folder";
+"Clear Screenshots Folder (%@)" = "Clear Screenshots Folder (%@)";
+"Show Snippets File" = "Show Snippets File";
+
+"Configuration" = "Configuration";
+"Show Config File" = "Show Config File";
+"config.json is broken — click to open; nothing is overwritten" = "config.json is broken — click to open; nothing is overwritten";
+
+"Sandy" = "Sandy";
+"Quit Sandy" = "Quit Sandy";
+
+/* Shelf */
+"Selected: %d" = "Selected: %d";
+"Deselect" = "Deselect";
+"Clear" = "Clear";
+"Copy" = "Copy";
+"Open" = "Open";
+"Show in Finder" = "Show in Finder";
+"Remove from Shelf" = "Remove from Shelf";
+
+/* Media */
+"Nothing is playing" = "Nothing is playing";
+
+/* Snippets */
+"Add a snippet" = "Add a snippet";
+"Name" = "Name";
+"Text" = "Text";
+"Delete" = "Delete";
+"Nothing here yet — add with +" = "Nothing here yet — add with +";
+"snippets.json is broken — click to open; nothing is overwritten" = "snippets.json is broken — click to open; nothing is overwritten";
+
+/* Notes */
+"Notes" = "Notes";
+"New Note" = "New Note";
+"Empty note" = "Empty note";
+"Jot something down…" = "Jot something down…";
+
+/* Translate */
+"Translation Languages…" = "Translation Languages…";
+"Retry" = "Retry";
+"The %@ → %@ language pack is not installed." = "The %@ → %@ language pack is not installed.";
+"macOS does not translate this pair of languages." = "macOS does not translate this pair of languages.";
+
+/* Currency */
+"Search currency" = "Search currency";
+"Swap currencies" = "Swap currencies";
+"No currencies match" = "No currencies match";
+
+/* Calendar */
+"Join" = "Join";
+"Join · %@" = "Join · %@";
+"No other meetings this week" = "No other meetings this week";
+"See your next meetings" = "See your next meetings";
+"Sandy needs access to Calendar. It is the only permission\nthe app asks for, and only for this tab." = "Sandy needs access to Calendar to show your meetings.\nAccess is requested only for this tab.";
+"Continue" = "Continue";
+"Calendar access is off" = "Calendar access is off";
+"Settings → Privacy → Calendars" = "Settings → Privacy → Calendars";
+"No more meetings" = "No more meetings";
+"Nothing on the calendar for the next day" = "Nothing on the calendar for the next day";
+"Untitled" = "Untitled";
+"Calendars" = "Calendars";
+"Done" = "Done";
+
+/* Countdown, lower-case: the capital is added where the label is built.
+   Abbreviated on purpose: a panel header has room for "in 12 min"
+   and not for a spelled-out plural, and abbreviations decline in no language. */
+"now" = "now";
+"any moment" = "any moment";
+"tomorrow" = "tomorrow";
+"in %d min" = "in %d min";
+"in %d h" = "in %d h";
+"in %d h %d min" = "in %d h %d min";
+"in %d d" = "in %d d";
+
+/* Saved screenshots. The key is the date format itself, so a language can put
+   the parts in its own order. */
+"Screenshot" = "Screenshot";
+"yyyy-MM-dd 'at' HH.mm.ss" = "yyyy-MM-dd 'at' HH.mm.ss";
+
+/* Privacy mode: the panel covers what it holds with a field of dots. */
+"Hide Contents" = "Hide Contents";
+"Hidden" = "Hidden";
+"Show" = "Show";
+"Hide" = "Hide";
+"All" = "All";
+
+"Teleprompter" = "Teleprompter";
+"Paste the script here" = "Paste the script here";
+"Ready" = "Ready";
+"Utilities" = "Utilities";
+"Lock Keyboard" = "Lock Keyboard";
+"Wipe the keys and the screen. Hold Esc or − for %d s to\nunlock; it also unlocks by itself after a minute" = "Wipe the keys and the screen. Hold Esc or − for %d s to\nunlock; it also unlocks by itself after a minute";
+"Allow in Settings" = "Allow in Settings";
+"Input is protected" = "Input is protected";
+"Could not take over input" = "Could not take over input";
+"Still unlocking" = "Still unlocking";
+"Lock ended early" = "Lock ended early";
+"An app turned on secure keyboard entry, so keys stopped\nreaching the lock. It ended instead of pretending" = "An app turned on secure keyboard entry, so keys stopped\nreaching the lock. It ended instead of pretending";
+"The previous lock is still being taken down.\nPress again in a moment" = "The previous lock is still being taken down.\nPress again in a moment";
+"An app is holding secure keyboard entry — a password field,\na password manager, a terminal. Close it and press again" = "An app is holding secure keyboard entry — a password field,\na password manager, a terminal. Close it and press again";
+"The system refused the event tap. Re-granting Accessibility\nusually fixes it — the permission is tied to the app's signature" = "The system refused the event tap. Re-granting Accessibility\nusually fixes it — the permission is tied to the app's signature";
+"Sandy needs Accessibility to swallow keys and clicks.\nSystem Settings → Privacy & Security → Accessibility" = "Sandy needs Accessibility to swallow keys and clicks.\nSystem Settings → Privacy & Security → Accessibility";
+"Keyboard and trackpad are locked" = "Keyboard and trackpad are locked";
+"Hold Esc or − for %d s" = "Hold Esc or − for %d s";
+"Unlocks by itself in %d s" = "Unlocks by itself in %d s";
+
+/* AI agent monitoring */
+"Agents" = "Agents";
+"Agent Monitoring" = "Agent Monitoring";
+"Monitoring" = "Monitoring";
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Agent Notifications" = "Agent Notifications";
+"Enable Notifications" = "Enable Notifications";
+"Install Claude Hooks" = "Install Claude Hooks";
+"Remove Claude Hooks" = "Remove Claude Hooks";
+"Monitor is off" = "Monitor is off";
+"Starting agent monitor…" = "Starting agent monitor…";
+"Listening for agent events" = "Listening for agent events";
+"Agent helper is missing. Rebuild Sandy with sandy-agent." = "Agent helper is missing. Rebuild Sandy with sandy-agent.";
+"Agent monitor disconnected. Retry to reconnect." = "Agent monitor disconnected. Retry to reconnect.";
+"Monitoring paused during sleep" = "Monitoring paused during sleep";
+"No sources selected" = "No sources selected";
+"Could not update Claude hooks" = "Could not update Claude hooks";
+"Claude hooks installed" = "Claude hooks installed";
+"Claude hooks removed" = "Claude hooks removed";
+"Agent notifications are off" = "Agent notifications are off";
+"Notifications allowed" = "Notifications allowed";
+"Notifications blocked in System Settings" = "Notifications blocked in System Settings";
+"Notification permission was not granted" = "Notification permission was not granted";
+"Could not save agent history" = "Could not save agent history";
+"Agent history could not be read. Existing file was preserved." = "Agent history could not be read. Existing file was preserved.";
+"Answer Ready" = "Answer Ready";
+"Your Input Is Needed" = "Your Input Is Needed";
+"Agent Error" = "Agent Error";
+"Open Agent Session" = "Open Agent Session";
+"Sessions" = "Sessions";
+"Analytics" = "Analytics";
+"Active: %d" = "Active: %d";
+"Active Time" = "Active Time";
+"Operations" = "Operations";
+"Tokens · in %@ · out %@" = "Tokens · in %@ · out %@";
+"No Data" = "No Data";
+"Sessions: %d" = "Sessions: %d";
+"Saved on this Mac" = "Saved on this Mac";
+"Token counts are cumulative. Missing values are shown as No Data." = "Token counts are cumulative. Missing values are shown as No Data.";
+"No Agent Sessions Yet" = "No Agent Sessions Yet";
+"Start a supported Claude Code or Codex session. Events will appear here." = "Start a supported Claude Code or Codex session. Events will appear here.";
+"Enable monitoring in Settings to see your agent sessions here." = "Enable monitoring in Settings to see your agent sessions here.";
+"Unknown Project" = "Unknown Project";
+"Idle" = "Idle";
+"Working" = "Working";
+"Waiting for Input" = "Waiting for Input";
+"Session Ended" = "Session Ended";
+"Disconnected" = "Disconnected";
+"Sandy asks for notification permission only when you enable this switch." = "Sandy asks for notification permission only when you enable this switch.";
+"Claude hooks are installed only when you click Install. Your existing hooks are kept." = "Claude hooks are installed only when you click Install. Your existing hooks are kept.";
+"Updating Claude Hooks…" = "Updating Claude Hooks…";
+
+/* Agent operation labels, translated when displayed. */
+"Run Command" = "Run Command";
+"Run Code" = "Run Code";
+"Read File" = "Read File";
+"Write File" = "Write File";
+"Edit File" = "Edit File";
+"Search Files" = "Search Files";
+"Fetch Page" = "Fetch Page";
+"Search Web" = "Search Web";
+"Subagent" = "Subagent";
+"Task Plan" = "Task Plan";
+"Ask User" = "Ask User";
+"Compact Context" = "Compact Context";
+"Turn Interrupted" = "Turn Interrupted";
+"Image Operation" = "Image Operation";
+
+/* Language and keyboard shortcut settings. */
+"Language" = "Language";
+"System Language" = "System Language";
+"Enable Keyboard Shortcut" = "Enable Keyboard Shortcut";
+"Keyboard Shortcut" = "Keyboard Shortcut";
+"Press the shortcut again or Esc to close." = "Press the shortcut again or Esc to close.";
+"This shortcut is unavailable. Choose another combination." = "This shortcut is unavailable. Choose another combination.";
+"Space" = "Space";
+
+/* New features: utilities timer, OCR, clipboard settings, meeting alerts, translation pair */
+"Timer" = "Timer";
+"Time is up" = "Time is up";
+"%d min" = "%d min";
+"Keep Awake" = "Keep Awake";
+"Copy Text" = "Copy Text";
+"Send to Teleprompter" = "Send to Teleprompter";
+"Open in Terminal" = "Open in Terminal";
+"Keep History Between Launches" = "Keep History Between Launches";
+"History Size" = "History Size";
+"Excluded Apps" = "Excluded Apps";
+"Don't Save Copies from %@" = "Don't Save Copies from %@";
+"Meeting Reminders" = "Meeting Reminders";
+"Before Start" = "Before Start";
+"Upcoming Meeting" = "Upcoming Meeting";
+"Translate From" = "Translate From";
+"Translate To" = "Translate To";
+"Automatic" = "Automatic";
+"Remove Only Listed Files" = "Remove Only Listed Files";
+"Image" = "Image";
+"Quick Look" = "Quick Look";
+"Nothing Copied Yet" = "Nothing Copied Yet";
+"Search" = "Search";
+
+/* Mobile access */
+"Phone Access" = "Phone Access";
+"HTTPS relay URL" = "HTTPS relay URL";
+"Relay access key" = "Relay access key";
+"Connect Phone Link" = "Connect Phone Link";
+"Disconnect Phone Link" = "Disconnect Phone Link";
+"Pair Phone" = "Pair Phone";
+"Copy Pairing Code" = "Copy Pairing Code";
+"Pairing expires in two minutes. Keep this code private." = "Pairing expires in two minutes. Keep this code private.";
+"Compare the fingerprint on your phone before allowing it." = "Compare the fingerprint on your phone before allowing it.";
+"Trust This Phone" = "Trust This Phone";
+"Revoke Phone" = "Revoke Phone";
+"Install Mobile Approvals" = "Install Mobile Approvals";
+"Remove Mobile Approvals" = "Remove Mobile Approvals";
+"Could not load mobile keys" = "Could not load mobile keys";
+"Enter relay URL and access key" = "Enter relay URL and access key";
+"Mobile setup is invalid" = "Mobile setup is invalid";
+"Connecting to mobile relay…" = "Connecting to mobile relay…";
+"Mobile link connected" = "Mobile link connected";
+"Mobile link disconnected; retrying" = "Mobile link disconnected; retrying";
+"Could not create pairing" = "Could not create pairing";
+"Could not save mobile keys" = "Could not save mobile keys";
+"Request expired or already resolved" = "Request expired or already resolved";
+"Allow Once" = "Allow Once";
+"Deny" = "Deny";
+"Completion Glow" = "Completion Glow";
+"The notch lights up briefly when an agent finishes a response." = "The notch lights up briefly when an agent finishes a response.";
+"Open in Editor" = "Open in Editor";

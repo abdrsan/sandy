@@ -1,0 +1,27 @@
+.build/
+build/
+.DS_Store
+*.xcodeproj
+*.xcworkspace
+.swiftpm/
+
+# Чтобы секрет не уехал в публичный репозиторий по случайности
+.env
+.env.*
+*.pem
+*.p12
+*.key
+*.mobileprovision
+*.certSigningRequest
+
+# Mobile build output and local push credentials
+Mobile/gateway/state/
+Mobile/android/.gradle/
+Mobile/android/local.properties
+Mobile/android/**/build/
+Mobile/ios/DerivedData/
+*.p8
+*service-account*.json
+google-services.json
+Mobile/gateway/secrets/
+Mobile/android/app/src/main/res/values/firebase.xml

@@ -1,0 +1,4 @@
+/* System permission prompts. */
+"NSAppleEventsUsageDescription" = "Sandy 会读取当前曲目的名称，并控制 Apple Music 和 Spotify 的播放。";
+"NSCalendarsFullAccessUsageDescription" = "Sandy 会显示即将举行的会议以及加入会议的按钮。";
+"NSCalendarsUsageDescription" = "Sandy 会显示即将举行的会议以及加入会议的按钮。";

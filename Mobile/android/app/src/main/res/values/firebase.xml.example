@@ -1,0 +1,7 @@
+<resources>
+  <!-- Public Firebase app configuration, not a server credential. Copy to firebase.xml and use your Firebase project's values. -->
+  <string name="google_app_id" translatable="false">YOUR_ANDROID_APP_ID</string>
+  <string name="google_api_key" translatable="false">YOUR_ANDROID_API_KEY</string>
+  <string name="gcm_defaultSenderId" translatable="false">YOUR_SENDER_ID</string>
+  <string name="project_id" translatable="false">YOUR_PROJECT_ID</string>
+</resources>

@@ -1,0 +1,6 @@
+{$SANDY_RELAY_HOST} {
+    reverse_proxy relay:8787
+    request_body {
+        max_size 70KB
+    }
+}

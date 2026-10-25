@@ -1,0 +1,4 @@
+/* System permission prompts. */
+"NSAppleEventsUsageDescription" = "Sandy ағымдағы тректің атауын оқиды және Apple Music пен Spotify ойнатуын басқарады.";
+"NSCalendarsFullAccessUsageDescription" = "Sandy алдағы кездесулерді және оларға қосылу түймесін көрсетеді.";
+"NSCalendarsUsageDescription" = "Sandy алдағы кездесулерді және оларға қосылу түймесін көрсетеді.";

@@ -1,0 +1,168 @@
+name: build
+
+# Проверяем локализации, тесты хранилища, сборку бандла, запуск и медиахелпер.
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    # macOS 15 — минимум приложения: Translation.framework младше не бывает.
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Ключи перевода совпадают с кодом
+        # Первым шагом, а не последним: проверка занимает секунды, а сборка
+        # минуты, и автор пропущенного ключа должен увидеть красный сразу,
+        # а не после того, как всё собралось (#50 узнал о двух ключах через
+        # шесть дней и одну сборку).
+        # Строка, для которой нет ключа, не ломает сборку — она просто
+        # показывается по-английски тому, у кого выбран русский. Ловятся оба
+        # пути локализации: явный localized(...) и литералы, которые SwiftUI
+        # локализует сам — Text("…"), Button("…"), TextField("…") (#12).
+        # Литералы с интерполяцией — не ключи, они отбрасываются. Как и
+        # литералы без единой буквы: "0" в пустом поле ввода и "—" в прочерке
+        # переводить нечем, а проверка требовала для них ключ и красила PR
+        # красным ни за что.
+        run: |
+          python3 - <<'PY'
+          import re, io, pathlib, sys
+          pat = re.compile(r'\b(?:localized|Text|Button|TextField)\(\s*"((?:[^"\\]|\\.)+)"')
+          code = set()
+          for p in pathlib.Path("Sources").rglob("*.swift"):
+              for m in pat.finditer(io.open(p, encoding="utf-8").read()):
+                  key = m.group(1)
+                  if "\\(" in key or not any(c.isalpha() for c in key):
+                      continue
+                  code.add(key.replace("\\n", "\n"))
+          bad = False
+          for table in pathlib.Path("Resources").glob("*.lproj/Localizable.strings"):
+              text = io.open(table, encoding="utf-8").read()
+              keys = {k.replace("\\n", "\n") for k in re.findall(r'^"((?:[^"\\]|\\.)*)"\s*=', text, re.M)}
+              missing = code - keys
+              if missing:
+                  bad = True
+                  print(f"{table}: нет ключей: {sorted(missing)}")
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Версия Swift
+        run: swift --version
+
+      - name: Кэш сборки
+        # Зависимостей у пакета нет, кэшируются собственные объектные файлы:
+        # правка в одном файле пересобирает один файл, а не всё с нуля. Ключ
+        # уникален на коммит, чтобы кэш обновлялся, а восстанавливается по
+        # префиксу — с ближайшего предыдущего.
+        uses: actions/cache@v6
+        with:
+          path: .build
+          key: swiftpm-${{ runner.os }}-${{ hashFiles('Package.swift') }}-${{ github.sha }}
+          restore-keys: |
+            swiftpm-${{ runner.os }}-${{ hashFiles('Package.swift') }}-
+
+      - name: Тесты на сторы
+        # Раньше сборки приложения: разбор snippets.json ломался трижды (#7,
+        # #14, #64), и узнавать об этом после десятиминутной сборки бандла —
+        # ровно то, чего эти тесты и должны избавить. Панель сюда не входит,
+        # см. CONTRIBUTING.md.
+        run: ./Scripts/test.sh
+
+      - name: Сборка приложения
+        run: ./Scripts/bundle.sh release
+
+      - name: Проверить, что в бандле лежит то, что нужно
+        run: |
+          APP=build/Sandy.app
+          VERSION="$(sed -n 's/^VERSION=//p' Scripts/version)"
+          test -x "$APP/Contents/MacOS/Sandy"
+          test -f "$APP/Contents/Resources/libsandymedia.dylib"
+          # Хелпер мониторинга агентов: без него вкладка «Агенты» показывает
+          # только «хелпер отсутствует», и сборка при этом остаётся зелёной.
+          test -x "$APP/Contents/Helpers/sandy-agent"
+          codesign --verify --strict "$APP/Contents/Helpers/sandy-agent"
+          "$APP/Contents/Helpers/sandy-agent" --version
+          # Локализации кладет тот же скрипт, и молча потерять их проще всего:
+          # приложение с пропавшей таблицей запускается и выглядит целым.
+          test -f "$APP/Contents/Resources/en.lproj/Localizable.strings"
+          test -f "$APP/Contents/Resources/ru.lproj/Localizable.strings"
+          for lproj in Resources/*.lproj; do
+            language="$(basename "$lproj")"
+            cmp "$lproj/Localizable.strings" "$APP/Contents/Resources/$language/Localizable.strings"
+            cmp "$lproj/InfoPlist.strings" "$APP/Contents/Resources/$language/InfoPlist.strings"
+          done
+          test -f "$APP/Contents/Resources/LICENSE"
+          test -f "$APP/Contents/Resources/THIRD_PARTY_NOTICES.md"
+          cmp LICENSE "$APP/Contents/Resources/LICENSE"
+          cmp THIRD_PARTY_NOTICES.md "$APP/Contents/Resources/THIRD_PARTY_NOTICES.md"
+          INSIDE="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$APP/Contents/Info.plist")"
+          test "$INSIDE" = "$VERSION" || { echo "версия в бандле $INSIDE, в Scripts/version $VERSION"; exit 1; }
+          # Раньше эта проверка отсутствовала, и неподписанный бандл проходил CI
+          # незамеченным: шаг смотрел на наличие файлов, а не на подпись (#19).
+          codesign --verify --strict "$APP"
+
+      - name: Приложение переживает запуск
+        # Единственный шаг, который запускает само приложение.
+        #
+        # Его не было, и из-за этого 0.8.0 уехало в релиз падающим (#108).
+        # Ломалось не то, что собирается, а то, что исполняется: замыкание,
+        # записанное внутри `@MainActor`-типа, наследовало изоляцию и
+        # проверялось рантаймом при вызове с чужой очереди. Компилятор молчал,
+        # все шаги выше были зелёными.
+        #
+        # Полке заранее подкладывается файл, и это главное здесь. На чистом
+        # раннере полка пуста, превью не запрашиваются, и именно та ветка, что
+        # роняла людей, не исполнилась бы ни разу. С подложенным файлом
+        # `loadThumbnail` зовёт QuickLook, а тот отвечает со своей очереди —
+        # то самое место.
+        run: |
+          set -u
+          SEED="$RUNNER_TEMP/seed.png"
+          # Любой файл, для которого QuickLook станет делать превью.
+          sips -s format png --resampleWidth 64 \
+            /System/Library/CoreServices/DefaultDesktop.heic --out "$SEED" >/dev/null 2>&1 \
+            || cp Resources/AppIcon.icns "$SEED"
+          defaults write com.abdirakhym.sandy shelf.urls -array "$SEED"
+          defaults write com.abdirakhym.sandy hiddenTabs -array
+
+          LOG="$RUNNER_TEMP/sandy.log"
+          build/Sandy.app/Contents/MacOS/Sandy >"$LOG" 2>&1 &
+          PID=$!
+          sleep 15
+
+          if kill -0 "$PID" 2>/dev/null; then
+            kill "$PID" 2>/dev/null || true
+            echo "приложение прожило 15 секунд"
+            exit 0
+          fi
+
+          # `-e` из объявления шага снял бы скрипт прямо здесь, на ненулевом
+          # коде `wait`, и весь блок ниже остался бы ненапечатанным — ровно
+          # то, ради чего он написан. Проверено: без этой строки в прогоне
+          # видно только «exit code 133».
+          set +e
+          wait "$PID" 2>/dev/null
+          CODE=$?
+          echo "::error::Sandy не пережил запуск, код $CODE"
+          echo "--- вывод приложения ---"
+          cat "$LOG" || true
+          echo "--- отчёты о падении ---"
+          for f in "$HOME/Library/Logs/DiagnosticReports"/Sandy*.ips; do
+            [ -e "$f" ] || continue
+            echo "=== $f ==="
+            head -c 4000 "$f"
+          done
+          exit 1
+
+      - name: Now Playing helper отвечает
+        # Единственная проверка, которая смотрит не на файлы, а на поведение.
+        # Хелпер может собраться, подписаться и лечь в бандл, оставаясь при этом
+        # немым — так уже было, и вкладка «Музыка» уехала бы в релиз мёртвой,
+        # пройдя все шаги выше зелёными. На раннере ничего не играет, поэтому
+        # проверяется только то, что на "get" приходит валидный JSON.
+        run: ./Scripts/test-helper.sh

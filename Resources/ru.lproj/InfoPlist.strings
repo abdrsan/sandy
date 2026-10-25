@@ -1,0 +1,4 @@
+/* System permission prompts. */
+"NSAppleEventsUsageDescription" = "Sandy читает название текущего трека и управляет воспроизведением в Apple Music и Spotify.";
+"NSCalendarsFullAccessUsageDescription" = "Sandy показывает ближайшие встречи и кнопку подключения к ним.";
+"NSCalendarsUsageDescription" = "Sandy показывает ближайшие встречи и кнопку подключения к ним.";

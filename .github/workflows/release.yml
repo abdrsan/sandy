@@ -1,0 +1,129 @@
+name: release
+
+# Выпуск версии по пушу тега: образ, контрольная сумма и релиз на GitHub
+# собираются на раннере, а не на чьей-то машине. Заметки к релизу берутся из
+# docs/releases/<версия>.md — их пишет человек до тега, см. Scripts/release.sh,
+# который проверяет всё нужное и ставит тег.
+#
+# Ручной запуск — пробный прогон: образ собирается и кладётся артефактом,
+# релиз не публикуется. Так workflow проверяется без тега.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    env:
+      # Секреты нельзя читать в `if` напрямую, поэтому их наличие снимается
+      # здесь в обычную переменную. Без сертификата workflow собирает ad-hoc,
+      # как локальная сборка: так пробный прогон работает и в форке без
+      # секретов, а релиз без подписи не выпустится — шаг ниже это проверит.
+      HAS_CERT: ${{ secrets.DEVELOPER_ID_P12 != '' }}
+      HAS_NOTARY: ${{ secrets.NOTARY_KEY_P8 != '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Вся история и теги: список изменений считается от предыдущего тега.
+          fetch-depth: 0
+
+      - name: Релиз без подписи не выпускается
+        if: github.ref_type == 'tag' && (env.HAS_CERT != 'true' || env.HAS_NOTARY != 'true')
+        run: |
+          echo "нет секретов подписи или нотаризации — см. docs/signing.md"
+          exit 1
+
+      - name: Сертификат Developer ID во временную связку ключей
+        if: env.HAS_CERT == 'true'
+        env:
+          P12_BASE64: ${{ secrets.DEVELOPER_ID_P12 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+        run: |
+          # Своя связка на прогон, а не login: раннер одноразовый, но привычка
+          # правильная — ключ живёт ровно столько, сколько идёт сборка.
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/developer-id.p12"
+          security import "$RUNNER_TEMP/developer-id.p12" -k "$KEYCHAIN" -P "$P12_PASSWORD" \
+              -T /usr/bin/codesign -T /usr/bin/security
+          rm -f "$RUNNER_TEMP/developer-id.p12"
+          # Иначе codesign остановится на диалоге «разрешить доступ к ключу»,
+          # которого на раннере никто не увидит.
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" \
+              | sed -n 's/.*"\(Developer ID Application: [^"]*\)".*/\1/p' | head -1)"
+          test -n "$IDENTITY" || { echo "в .p12 нет сертификата Developer ID Application"; exit 1; }
+          echo "CODESIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+          echo "    подпись: $IDENTITY"
+
+      - name: Ключ нотаризации
+        if: env.HAS_NOTARY == 'true'
+        env:
+          KEY_BASE64: ${{ secrets.NOTARY_KEY_P8 }}
+        run: |
+          printf '%s' "$KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+          chmod 600 "$RUNNER_TEMP/AuthKey.p8"
+          {
+            echo "NOTARY_KEY_PATH=$RUNNER_TEMP/AuthKey.p8"
+            echo "NOTARY_KEY_ID=${{ secrets.NOTARY_KEY_ID }}"
+            echo "NOTARY_ISSUER_ID=${{ secrets.NOTARY_ISSUER_ID }}"
+            echo "NOTARIZE=1"
+          } >> "$GITHUB_ENV"
+
+      - name: Тег, версия и заметки согласованы
+        run: |
+          VERSION="$(sed -n 's/^VERSION=//p' Scripts/version)"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            test "$GITHUB_REF_NAME" = "v$VERSION" || { echo "тег $GITHUB_REF_NAME, а в Scripts/version $VERSION"; exit 1; }
+            test -f "docs/releases/$VERSION.md" || { echo "нет docs/releases/$VERSION.md — релиз без заметок не выпускается"; exit 1; }
+          fi
+
+      - name: Образ
+        # С CODESIGN_IDENTITY и NOTARIZE=1 из шагов выше — подписанный и
+        # нотаризованный; без них — ad-hoc, для пробного прогона.
+        run: ./Scripts/dmg.sh
+
+      - name: Контрольная сумма
+        run: |
+          shasum -a 256 "build/Sandy-$VERSION.dmg" | tee build/SHA256SUMS
+          codesign --verify --strict "build/Sandy.app"
+
+      - name: Пробный прогон — образ артефактом
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Sandy-${{ env.VERSION }}-dry-run
+          path: |
+            build/Sandy-${{ env.VERSION }}.dmg
+            build/SHA256SUMS
+
+      - name: Релиз на GitHub
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v$VERSION"
+          DMG="build/Sandy-$VERSION.dmg"
+          # Список коммитов берётся отдельным вызовом, а не флагом
+          # --generate-notes: флаг заменил бы собой всё тело, и человеческая
+          # часть в него бы не попала.
+          PREVIOUS="$(git tag --sort=-v:refname | sed -n 2p)"
+          GENERATED="$(gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$TAG" ${PREVIOUS:+-f previous_tag_name="$PREVIOUS"} \
+              --jq '.body' 2>/dev/null || true)"
+          BODY="$(mktemp)"
+          cat "docs/releases/$VERSION.md" > "$BODY"
+          SUM="$(cut -d' ' -f1 build/SHA256SUMS)"
+          printf '\n\n**SHA-256** `%s`\n\nПроверить: `shasum -a 256 Sandy-%s.dmg`\n' "$SUM" "$VERSION" >> "$BODY"
+          [ -n "$GENERATED" ] && printf '\n\n---\n\n%s\n' "$GENERATED" >> "$BODY"
+          gh release create "$TAG" "$DMG" --title "Sandy $VERSION" --notes-file "$BODY" --latest
+          gh release view "$TAG" --json url --jq '.url'
