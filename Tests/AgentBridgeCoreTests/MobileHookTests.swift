@@ -43,7 +43,16 @@ import Testing
     private func runHook(enabled:Bool) throws -> Data {
         var bin=URL(fileURLWithPath:CommandLine.arguments[0]).deletingLastPathComponent()
         for _ in 0..<6 { if FileManager.default.isExecutableFile(atPath:bin.appendingPathComponent("sandy-agent").path) { break };bin.deleteLastPathComponent() }
-        let helper=bin.appendingPathComponent("sandy-agent")
+        var helper=bin.appendingPathComponent("sandy-agent")
+        if !FileManager.default.isExecutableFile(atPath:helper.path) {
+            // The test runner may live outside the package (toolchain
+            // helper); the build products stay under the package root.
+            let cwd=URL(fileURLWithPath:FileManager.default.currentDirectoryPath)
+            for base in [".build/debug",".build/arm64-apple-macosx/debug"] {
+                let candidate=cwd.appendingPathComponent(base).appendingPathComponent("sandy-agent")
+                if FileManager.default.isExecutableFile(atPath:candidate.path) { helper=candidate;break }
+            }
+        }
         #expect(FileManager.default.isExecutableFile(atPath:helper.path))
         let root=FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at:root,withIntermediateDirectories:true)

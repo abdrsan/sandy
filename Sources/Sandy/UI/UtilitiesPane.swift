@@ -63,49 +63,87 @@ struct UtilitiesPane: View {
         .onAppear { lock.clearRefusal() }
     }
 
-    /// Timer presets on the left, the keep-awake switch on the right — one
-    /// strip under the lock, so the pane stays a single glance.
+    /// Two compact strips under the lock: countdowns on top, reminders and
+    /// the keep-awake switch below. Capsules, so the pane stays a glance.
     private var controls: some View {
-        HStack(spacing: 8) {
-            if utilities.timerRunning {
-                Image(systemName: "timer")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(Theme.secondary)
-                Text(Self.clock(utilities.remaining))
-                    .font(.system(size: 11, weight: .medium).monospacedDigit())
-                    .foregroundStyle(.white)
-                Button { utilities.cancelTimer() } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 9, weight: .semibold))
+        VStack(spacing: 6) {
+            HStack(spacing: 8) {
+                if utilities.timerRunning {
+                    Image(systemName: utilities.pomodoroRunning ? "timer" : "timer")
+                        .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(Theme.secondary)
-                }
-                .buttonStyle(.plain)
-                .pointerStyle(.default)
-            } else {
-                ForEach(UtilitiesStore.presetMinutes, id: \.self) { minutes in
-                    Button { utilities.startTimer(minutes: minutes) } label: {
-                        Text(localized("%d min", minutes))
-                            .font(.system(size: 10, weight: .medium).monospacedDigit())
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Capsule().fill(Theme.surfaceHover))
+                    if let work = utilities.pomodoroIsWork {
+                        Text(localized(work ? "Focus" : "Break"))
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(work ? Color.orange : Color.cyan)
+                    }
+                    Text(Self.clock(utilities.remaining))
+                        .font(.system(size: 11, weight: .medium).monospacedDigit())
+                        .foregroundStyle(.white)
+                    Button { utilities.cancelTimer() } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(Theme.secondary)
                     }
                     .buttonStyle(.plain)
                     .pointerStyle(.default)
+                } else {
+                    ForEach(UtilitiesStore.presetMinutes, id: \.self) { minutes in
+                        capsule(localized("%d min", minutes)) {
+                            utilities.startTimer(minutes: minutes)
+                        }
+                    }
+                    capsule(localized("Pomodoro")) { utilities.startPomodoro() }
                 }
+                Spacer(minLength: 6)
             }
-            Spacer(minLength: 6)
-            Button { utilities.setKeepAwake(!utilities.keepAwake) } label: {
-                Label(localized("Keep Awake"), systemImage: utilities.keepAwake ? "bolt.fill" : "bolt")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(utilities.keepAwake ? .white : Theme.secondary)
+            HStack(spacing: 8) {
+                Button { utilities.setWater(!utilities.waterOn) } label: {
+                    Label(localized("Water"), systemImage: utilities.waterOn ? "drop.fill" : "drop")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(utilities.waterOn ? .white : Theme.secondary)
+                }
+                .buttonStyle(.plain)
+                .pointerStyle(.default)
+                if utilities.waterOn {
+                    ForEach(UtilitiesStore.waterOptions, id: \.self) { minutes in
+                        Button { utilities.setWaterMinutes(minutes) } label: {
+                            Text(localized("%d min", minutes))
+                                .font(.system(size: 9, weight: .medium).monospacedDigit())
+                                .foregroundStyle(minutes == utilities.waterMinutes ? .white : Theme.secondary)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 3)
+                                .background(Capsule().fill(minutes == utilities.waterMinutes ? Theme.surfaceHover : Color.clear))
+                        }
+                        .buttonStyle(.plain)
+                        .pointerStyle(.default)
+                    }
+                }
+                Spacer(minLength: 6)
+                Button { utilities.setKeepAwake(!utilities.keepAwake) } label: {
+                    Label(localized("Keep Awake"), systemImage: utilities.keepAwake ? "bolt.fill" : "bolt")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(utilities.keepAwake ? .white : Theme.secondary)
+                }
+                .buttonStyle(.plain)
+                .pointerStyle(.default)
             }
-            .buttonStyle(.plain)
-            .pointerStyle(.default)
         }
-        .frame(height: 24)
+        .frame(height: 52)
         .padding(.horizontal, 4)
+    }
+
+    private func capsule(_ text: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(text)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(Theme.surfaceHover))
+        }
+        .buttonStyle(.plain)
+        .pointerStyle(.default)
     }
 
     private static func clock(_ seconds: TimeInterval) -> String {

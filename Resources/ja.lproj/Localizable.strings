@@ -274,3 +274,9 @@
 "Not requested" = "未リクエスト";
 "Allowed" = "許可済み";
 "Blocked" = "ブロック済み";
+"Pomodoro" = "ポモドーロ";
+"Water" = "水";
+"Break" = "休憩";
+"Focus time" = "作業時間";
+"Break time" = "休憩時間";
+"Time to drink water" = "水を飲む時間です";

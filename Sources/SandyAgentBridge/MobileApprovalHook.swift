@@ -28,7 +28,9 @@ func runMobileApproval() {
     let response=folder.appendingPathComponent(approval.id+".response")
     do {
         try FileManager.default.createDirectory(at:folder,withIntermediateDirectories:true,attributes:[.posixPermissions:0o700])
-        try JSONEncoder().encode(approval).write(to:file,options:[.atomic,.withoutOverwriting])
+        // No .withoutOverwriting: combined with .atomic it is a fatal error on
+        // this Foundation — and the id is a UUID, so there is nothing to lose.
+        try JSONEncoder().encode(approval).write(to:file,options:.atomic)
         try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:file.path)
     } catch { return }
     defer { try? FileManager.default.removeItem(at:file); try? FileManager.default.removeItem(at:response) }
