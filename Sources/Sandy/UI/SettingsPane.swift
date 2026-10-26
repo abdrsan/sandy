@@ -43,6 +43,16 @@ struct SettingsPane: View {
                         title: localized("Show Menu Bar Icon"),
                         isOn: menuBarIconVisibleBinding
                     )
+                    // One switch that veils every section at once — for
+                    // recordings, demos and screen sharing.
+                    toggleRow(
+                        symbol: "eye.slash.fill",
+                        title: localized("Presentation Mode"),
+                        isOn: Binding(
+                            get: { vm.privacy.coversAll },
+                            set: { vm.privacy.setCoveringAll($0) }
+                        )
+                    )
                 }
 
                 // The rail is for what gets a glance between other things.

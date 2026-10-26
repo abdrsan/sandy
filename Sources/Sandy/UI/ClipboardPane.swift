@@ -95,10 +95,21 @@ private struct ClipRow: View {
                 seed: UInt64(bitPattern: Int64(item.id.uuidString.hashValue))
             )
             Spacer(minLength: 6)
+            if item.pinned {
+                Image(systemName: "pin.fill")
+                    .font(.system(size: 9))
+                    .foregroundStyle(Theme.secondary)
+            }
             if hovering {
                 if privacy.covers(.clipboard) {
                     RevealEye(hidden: hidden) { privacy.toggle(item.id.uuidString) }
                 }
+                Button { clipboard.togglePin(item) } label: {
+                    Image(systemName: item.pinned ? "pin.slash" : "pin")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(Theme.secondary)
+                }
+                .buttonStyle(.plain)
                 Button { clipboard.remove(item) } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 9, weight: .semibold))

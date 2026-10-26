@@ -254,6 +254,7 @@ final class NotchViewModel: ObservableObject {
     let teleprompter: TeleprompterStore
     let agents: AgentMonitorStore
     let utilities: UtilitiesStore
+    private let pomodoroBadge = PomodoroBadge()
     /// Shared by every pane that shows something worth not showing.
     let privacy = PrivacyMode()
     /// Here rather than in the controller, which now rebuilds a window per
@@ -276,6 +277,7 @@ final class NotchViewModel: ObservableObject {
         self.teleprompter = TeleprompterStore()
         self.agents = AgentMonitorStore()
         self.utilities = UtilitiesStore()
+        pomodoroBadge.bind(to: utilities)
         agents.onOpenSession = { [weak self] in
             guard let self else { return }
             setVisible(.agents, true)

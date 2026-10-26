@@ -12,6 +12,8 @@ struct ClipItem: Identifiable, Equatable {
     let id = UUID()
     let payload: Payload
     let date: Date
+    /// Pinned entries never leave: not by the limit, not by clear-all.
+    var pinned = false
 
     var preview: String {
         switch payload {
@@ -107,8 +109,15 @@ final class ClipboardStore: ObservableObject {
         timer = nil
     }
 
+    /// Clear-all keeps pinned rows — that is the whole point of pinning.
     func clear() {
-        items.removeAll()
+        items.removeAll { !$0.pinned }
+        scheduleSave()
+    }
+
+    func togglePin(_ item: ClipItem) {
+        guard let index = items.firstIndex(where: { $0.id == item.id }) else { return }
+        items[index].pinned.toggle()
         scheduleSave()
     }
 
@@ -230,7 +239,9 @@ final class ClipboardStore: ObservableObject {
     private func record(_ item: ClipItem) {
         items.removeAll { $0 == item }
         items.insert(item, at: 0)
-        if items.count > limit { items.removeLast(items.count - limit) }
+        while items.count > limit, let last = items.lastIndex(where: { !$0.pinned }) {
+            items.remove(at: last)
+        }
         scheduleSave()
     }
 
@@ -243,6 +254,7 @@ final class ClipboardStore: ObservableObject {
         var kind: String
         var value: String
         var date: Date
+        var pinned: Bool?
     }
 
     private static var file: URL { Support.file("clipboard.json") }
@@ -252,12 +264,15 @@ final class ClipboardStore: ObservableObject {
               let data = try? Data(contentsOf: Self.file),
               let stored = try? JSONDecoder().decode([StoredClip].self, from: data) else { return }
         items = stored.sorted { $0.date > $1.date }.prefix(limit).compactMap { clip in
+            var item: ClipItem
             switch clip.kind {
-            case "text": return ClipItem(payload: .text(clip.value), date: clip.date)
-            case "file": return ClipItem(payload: .file(URL(fileURLWithPath: clip.value)), date: clip.date)
-            case "image": return ClipItem(payload: .image(URL(fileURLWithPath: clip.value)), date: clip.date)
+            case "text": item = ClipItem(payload: .text(clip.value), date: clip.date)
+            case "file": item = ClipItem(payload: .file(URL(fileURLWithPath: clip.value)), date: clip.date)
+            case "image": item = ClipItem(payload: .image(URL(fileURLWithPath: clip.value)), date: clip.date)
             default: return nil
             }
+            item.pinned = clip.pinned ?? false
+            return item
         }
     }
 
@@ -270,9 +285,9 @@ final class ClipboardStore: ObservableObject {
         guard ConfigStore.shared.clipboardPersist else { return }
         let stored = items.map { item -> StoredClip in
             switch item.payload {
-            case .text(let string): return StoredClip(kind: "text", value: string, date: item.date)
-            case .file(let url): return StoredClip(kind: "file", value: url.path, date: item.date)
-            case .image(let url): return StoredClip(kind: "image", value: url.path, date: item.date)
+            case .text(let string): return StoredClip(kind: "text", value: string, date: item.date, pinned: item.pinned)
+            case .file(let url): return StoredClip(kind: "file", value: url.path, date: item.date, pinned: item.pinned)
+            case .image(let url): return StoredClip(kind: "image", value: url.path, date: item.date, pinned: item.pinned)
             }
         }
         do {

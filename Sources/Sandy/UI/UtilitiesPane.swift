@@ -119,6 +119,16 @@ struct UtilitiesPane: View {
                         .pointerStyle(.default)
                     }
                 }
+                if utilities.timerRunning || utilities.waterOn || utilities.keepAwake {
+                    Button { utilities.stopAll() } label: {
+                        Image(systemName: "stop.circle")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(Theme.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .pointerStyle(.default)
+                    .help(localized("Stop Everything"))
+                }
                 Spacer(minLength: 6)
                 Button { utilities.setKeepAwake(!utilities.keepAwake) } label: {
                     Label(localized("Keep Awake"), systemImage: utilities.keepAwake ? "bolt.fill" : "bolt")

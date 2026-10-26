@@ -159,11 +159,14 @@ final class UtilitiesStore: ObservableObject {
         }
     }
 
-    func stop() {
+    /// The "stop everything" button: one tap quiets the whole utilities row.
+    func stopAll() {
         cancelTimer()
         setKeepAwake(false)
         setWater(false)
     }
+
+    func stop() { stopAll() }
 
     // MARK: - Notification
 
