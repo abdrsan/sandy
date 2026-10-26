@@ -16,9 +16,13 @@ final class NotchController {
     func install() {
         let vm = NotchViewModel()
         self.vm = vm
+        vm.showFirstRunSetup = !ConfigStore.shared.onboardingComplete
         vm.onRevealAgentSession = { [weak self] in self?.target()?.reveal() }
         vm.start()
         rebuild()
+        if !ConfigStore.shared.onboardingComplete {
+            target()?.presentFirstRunSetup()
+        }
 
         for name in [
             NSApplication.didChangeScreenParametersNotification,
@@ -107,6 +111,7 @@ final class NotchController {
             let existing = panels.removeValue(forKey: id)
             if let existing, existing.geometry.matches(geometry) {
                 existing.setFrame(geometry.windowFrame)
+                existing.refreshInteractionSettings()
                 next[id] = existing
             } else {
                 existing?.teardown()

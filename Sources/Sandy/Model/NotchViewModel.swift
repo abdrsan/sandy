@@ -47,13 +47,13 @@ final class NotchViewModel: ObservableObject {
             self == .translate || self == .currency || self == .snippets || self == .notes
         }
 
-        /// Tabs whose content needs more than the standard 208 pt.
+        /// Tabs whose content needs more than the standard panel height.
         ///
         /// The teleprompter, which has to fit a paragraph to be read at a
         /// glance rather than to be scrolled; and settings, whose sections
         /// are lists — which tabs are on the panel, the screenshots, the
-        /// privacy sections — where a list of ten switches in 208 pt is a
-        /// list of three and a scroll, and settings is the one tab somebody
+        /// privacy sections — where a list of ten switches is only a few rows
+        /// and a scroll, and settings is the one tab somebody
         /// opens specifically to go through the whole of it.
         var wantsTallBody: Bool { self == .teleprompter || self == .settings || self == .agents }
 
@@ -61,21 +61,6 @@ final class NotchViewModel: ObservableObject {
         /// live on: with Settings gone there would be no way back.
         var canHide: Bool { self != .settings }
 
-        /// Which rail the icon sits on. The left one carries the original six
-        /// and is full — icon height is a ceiling now, not a constant (#26,
-        /// #27), so a seventh icon would not overflow the panel, but it would
-        /// shrink every icon on the rail to make room, which is the same
-        /// objection in a quieter voice. Growth continues in a second column
-        /// on the right, which the scratch notes open: they are the daily tab
-        /// of that column, so they sit where the pointer lands first. The rare
-        /// modes — the converter, the teleprompter — come after them, by the
-        /// rule from #43 that the rail is ordered by how often a tab is
-        /// glanced at. Settings joins that column rather than the content
-        /// rail: it is not something to hover past on the way to a track or a
-        /// calendar, so it sits last, furthest from the tabs people actually
-        /// rest on.
-        static let leftRail: [Tab] = [.media, .shelf, .clipboard, .snippets, .calendar, .translate]
-        static let rightRail: [Tab] = [.agents, .notes, .currency, .teleprompter, .utilities, .settings]
     }
 
     /// What every screen's panel adds up to, kept by `NotchController`: this
@@ -85,6 +70,7 @@ final class NotchViewModel: ObservableObject {
     private(set) var isPanelActive = false
     var isTyping = false
     var onRevealAgentSession: (() -> Void)?
+    @Published var showFirstRunSetup = false
 
     // MARK: - Which tabs are on the rail
 
@@ -101,20 +87,34 @@ final class NotchViewModel: ObservableObject {
     /// Persisted in `config.json` (#67), alongside the rest of what makes
     /// sense on another Mac.
     @Published private(set) var hiddenTabs: Set<Tab> = NotchViewModel.loadHiddenTabs()
+    @Published private(set) var orderedTabs: [Tab] = NotchViewModel.loadTabOrder()
 
     private static func loadHiddenTabs() -> Set<Tab> {
         let raw = ConfigStore.shared.hiddenTabs
         return Set(raw.compactMap(Tab.init(rawValue:))).filter(\.canHide)
     }
 
+    private static func loadTabOrder() -> [Tab] {
+        let stored = ConfigStore.shared.tabOrder.compactMap(Tab.init(rawValue:))
+        var seen = Set<Tab>()
+        return (stored + Tab.allCases).filter { seen.insert($0).inserted }
+    }
+
     func isVisible(_ tab: Tab) -> Bool { !hiddenTabs.contains(tab) }
 
-    /// The rails as they stand with the switches applied.
-    var leftRail: [Tab] { Tab.leftRail.filter(isVisible) }
-    var rightRail: [Tab] { Tab.rightRail.filter(isVisible) }
+    var visibleTabs: [Tab] { orderedTabs.filter(isVisible) }
+
+    func moveTab(_ tab: Tab, by offset: Int) {
+        guard let index = orderedTabs.firstIndex(of: tab) else { return }
+        let target = min(orderedTabs.count - 1, max(0, index + offset))
+        guard target != index else { return }
+        orderedTabs.swapAt(index, target)
+        ConfigStore.shared.tabOrder = orderedTabs.map(\.rawValue)
+        ConfigStore.shared.markProfileCustom()
+    }
 
     /// Where to land when the tab on screen is the one being taken away.
-    private var firstVisibleTab: Tab { leftRail.first ?? rightRail.first ?? .settings }
+    private var firstVisibleTab: Tab { visibleTabs.first ?? .settings }
 
     func setVisible(_ target: Tab, _ visible: Bool) {
         guard target.canHide, isVisible(target) != visible else { return }
@@ -130,6 +130,7 @@ final class NotchViewModel: ObservableObject {
             if tab == target { tab = firstVisibleTab }
         }
         ConfigStore.shared.hiddenTabs = hiddenTabs.map(\.rawValue).sorted()
+        ConfigStore.shared.markProfileCustom()
     }
 
     /// What a tab keeps running while nobody is looking at it. Only a few have
@@ -371,6 +372,17 @@ final class NotchViewModel: ObservableObject {
 
         // The background of every tab that is on the rail, and of no other.
         started = true
+        NotificationCenter.default.addObserver(forName: .sandyApplyProfile, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.hiddenTabs = Self.loadHiddenTabs()
+                self.orderedTabs = Self.loadTabOrder()
+                if !self.isVisible(self.tab) { self.tab = self.firstVisibleTab }
+                for tab in Tab.allCases where tab != .settings {
+                    if self.isVisible(tab) { self.startBackground(of: tab) } else { self.stopBackground(of: tab) }
+                }
+            }
+        }
         for target in Tab.allCases where isVisible(target) { startBackground(of: target) }
         // The default tab may have been switched off in a previous session.
         if !isVisible(tab) { tab = firstVisibleTab }

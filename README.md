@@ -15,7 +15,7 @@ Developed by Abdirakhym, based on the MIT-licensed
 localizations and agent integration live in this repository.
 [Third-party notices](THIRD_PARTY_NOTICES.md) preserve source attribution.
 
-**Status:** version **0.1.0**, built from source. Phone access is planned; the
+**Status:** version **0.2.0**, built from source. Phone access is planned; the
 current app sends agent notifications on the Mac only.
 
 ## Features
@@ -29,11 +29,11 @@ current app sends agent notifications on the Mac only.
 | Calendar | View upcoming meetings from calendars available on this Mac, open supported meeting links, and optionally get reminded 1–10 minutes before one starts. |
 | Translate | Translate on-device using downloaded macOS language packs; pick a pair in Settings or let the text script route English ↔ Russian automatically. |
 | Currency | Convert currencies using public exchange rates; refreshing rates requires an internet connection. |
-| Agents | Follow supported local Claude Code and Codex sessions, their latest operation, state and available usage statistics. The notch flashes when an answer is ready (can be disabled); a session's project opens in Terminal or an editor. |
+| Agents | Follow supported local Claude Code and Codex sessions, filter by provider or state, and pin important sessions. The notch flashes when an answer is ready (can be disabled); a session's project opens in Terminal or an editor. |
 | Notes | Keep short notes without opening another window. |
 | Teleprompter | Read a scrolling script near the camera while recording a demo, presenting or taking a call. |
 | Utilities | Use a timer, keep the Mac awake, or temporarily lock the keyboard for cleaning with Accessibility access. |
-| Settings | Switch among eight interface languages, choose a panel shortcut, hide tabs and configure displays or login launch. |
+| Settings | Switch among eight interface languages, reorder or hide tabs, choose hover/click/shortcut opening, save Work/Meetings/Focus tab profiles, adjust panel size, accent and animation, and inspect diagnostics. |
 
 Agent monitoring is passive: it does not start model requests or approve actions.
 Coverage depends on the source. Codex permission prompts and errors are not
@@ -162,7 +162,7 @@ Screen Recording is not required.
 
 ## Phone access and long tasks
 
-**Not implemented in Sandy 0.1.0.** There is no Sandy phone app, remote push channel,
+**Not implemented in Sandy 0.2.0.** There is no Sandy phone app, remote push channel,
 pairing flow or approval endpoint. Mac notifications do not automatically become
 iPhone or Android notifications.
 
@@ -222,7 +222,7 @@ python3 Scripts/check-localizations.py  # Check UI and permission strings
 ./Scripts/test.sh                      # Store, integration and protocol tests
 ./Scripts/bundle.sh                    # Build and verify Sandy.app
 ./Scripts/test-helper.sh               # Exercise the bundled media helper
-./Scripts/dmg.sh                       # Rebuild and package Sandy-0.1.0.dmg
+./Scripts/dmg.sh                       # Rebuild and package Sandy-0.2.0.dmg
 ```
 
 Automated checks do not cover all pointer interactions, drag and drop, actual

@@ -9,6 +9,8 @@ struct AgentsPane: View {
     @ObservedObject var privacy: PrivacyMode
     @State private var showingAnalytics = false
     @State private var sourceFilter: AgentSource?
+    @State private var stateFilter: AgentSessionState?
+    @State private var pinnedSessionIDs = Set(UserDefaults.standard.stringArray(forKey: "pinnedAgentSessionIDs") ?? [])
     @State private var reviewRequest: MobileApproval?
     @ObservedObject private var mobile = MobileLinkStore.shared
 
@@ -125,7 +127,8 @@ struct AgentsPane: View {
                         LazyVStack(spacing: 7) {
                             ForEach(mobile.approvalRequests) { request in approvalCard(request) }
                             ForEach(AgentSource.allCases.filter { sourceFilter == nil || $0 == sourceFilter }) { source in
-                                let group = store.sessions.filter { $0.source == source }
+                                let group = store.sessions.filter { $0.source == source && (stateFilter == nil || $0.state == stateFilter) }
+                                    .sorted { pinnedSessionIDs.contains($0.id) && !pinnedSessionIDs.contains($1.id) }
                                 if !group.isEmpty {
                                     HStack(spacing:6) {
                                         Image(systemName:source == .claude ? "sun.max.fill":"sparkle").foregroundStyle(source == .claude ? Color.orange:Color.indigo)
@@ -152,15 +155,24 @@ struct AgentsPane: View {
     }
 
     private var sourcePicker: some View {
-        HStack(spacing:5) {
-            Button(localized("All")) { sourceFilter=nil }
-                .foregroundStyle(sourceFilter == nil ? Color.green:Theme.secondary)
-            ForEach(AgentSource.allCases) { source in
-                Button(source.title) { sourceFilter=source }
-                    .foregroundStyle(sourceFilter == source ? Color.green:Theme.secondary)
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(spacing:5) {
+                Button(localized("All")) { sourceFilter=nil }
+                    .foregroundStyle(sourceFilter == nil ? Color.green:Theme.secondary)
+                ForEach(AgentSource.allCases) { source in
+                    Button(source.title) { sourceFilter=source }
+                        .foregroundStyle(sourceFilter == source ? Color.green:Theme.secondary)
+                }
+                Spacer()
             }
-            Spacer()
-        }.buttonStyle(.plain).font(.system(size:10,weight:.semibold,design:.monospaced))
+            HStack(spacing:5) {
+                ForEach(AgentSessionState.allCases, id: \.self) { state in
+                    Button(localized(state.rawValue.capitalized)) { stateFilter = stateFilter == state ? nil : state }
+                        .foregroundStyle(stateFilter == state ? state.displayColor : Theme.tertiary)
+                }
+                Spacer()
+            }
+        }.buttonStyle(.plain).font(.system(size:9,weight:.semibold,design:.monospaced))
     }
 
     private func approvalCard(_ request: MobileApproval) -> some View {
@@ -189,6 +201,14 @@ struct AgentsPane: View {
                         font:.system(size:13,weight:.bold,design:.monospaced),color:session.state == .working ? .green:.white,
                         height:16,seed:seed(session.id))
                     Spacer(minLength:0)
+                    Button {
+                        if pinnedSessionIDs.contains(session.id) { pinnedSessionIDs.remove(session.id) }
+                        else { pinnedSessionIDs.insert(session.id) }
+                        UserDefaults.standard.set(Array(pinnedSessionIDs), forKey: "pinnedAgentSessionIDs")
+                    } label: {
+                        Image(systemName: pinnedSessionIDs.contains(session.id) ? "pin.fill" : "pin")
+                            .foregroundStyle(pinnedSessionIDs.contains(session.id) ? Color.yellow : Theme.tertiary)
+                    }.buttonStyle(.plain).help(localized("Pinned"))
                     Text(formatTime(store.activeDuration(for:session,at:now)))
                         .font(.system(size:9,weight:.medium,design:.monospaced)).foregroundStyle(Theme.secondary)
                         .padding(.horizontal,6).padding(.vertical,3).background(RoundedRectangle(cornerRadius:5).fill(Color.white.opacity(0.06)))

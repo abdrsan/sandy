@@ -15,6 +15,11 @@
 "General" = "通用";
 "Launch at Login" = "登录时启动";
 "Show Menu Bar Icon" = "显示菜单栏图标";
+"Welcome to Sandy" = "欢迎使用 Sandy";
+"Hover over the notch or press %@ to open Sandy." = "将指针悬停在刘海处，或按 %@ 打开 Sandy。";
+"Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them." = "在设置中选择需要的标签页，并开启本地 Claude Code 或 Codex 会话监控。仅在功能需要时才会请求权限。";
+"Set Up in Settings" = "前往设置";
+"Start Using Sandy" = "开始使用 Sandy";
 "Show in Panel" = "在面板中显示";
 "Displays" = "显示器";
 "Show on All Displays" = "在所有显示器上显示";
@@ -232,3 +237,42 @@
 "Completion Glow" = "完成辉光";
 "The notch lights up briefly when an agent finishes a response." = "代理完成响应时刘海会短暂发光。";
 "Open in Editor" = "在编辑器中打开";
+
+"Accent Color" = "强调色";
+"Animations" = "动画";
+"Close Delay" = "关闭延迟";
+"Diagnostics" = "诊断";
+"Mobile Approvals" = "手机确认";
+"Move Down" = "下移";
+"Move Up" = "上移";
+"Needs attention" = "需要处理";
+"Not connected" = "未连接";
+"Panel Size" = "面板大小";
+"Personalization" = "个性化";
+"Profiles" = "配置方案";
+"Refresh Diagnostics" = "刷新诊断";
+"Hover" = "悬停";
+"Click" = "点击";
+"Shortcut" = "快捷键";
+"Work" = "工作";
+"Meetings" = "会议";
+"Focus" = "专注";
+"Compact" = "紧凑";
+"Regular" = "标准";
+"Large" = "大";
+"Mint" = "薄荷绿";
+"Blue" = "蓝色";
+"Purple" = "紫色";
+"Orange" = "橙色";
+"Connected" = "已连接";
+
+"Waiting" = "等待输入";
+"Ended" = "已结束";
+"Failed" = "失败";
+"Pinned" = "置顶";
+
+"Calendar Permission" = "日历权限";
+"Notifications" = "通知";
+"Not requested" = "尚未请求";
+"Allowed" = "已允许";
+"Blocked" = "已阻止";

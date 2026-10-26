@@ -21,6 +21,7 @@ final class PanelState: ObservableObject {
     /// Raised when any of the three above moves, so whoever owns every screen
     /// can recompute what the shared model needs to know about the panels.
     var onChange: (() -> Void)?
+    var finishFirstRunSetup: ((Bool) -> Void)?
 
     init(geometry: NotchGeometry, vm: NotchViewModel) {
         self.geometry = geometry

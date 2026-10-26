@@ -21,6 +21,11 @@
 "General" = "Общее";
 "Launch at Login" = "Запускать при входе";
 "Show Menu Bar Icon" = "Показывать иконку в меню-баре";
+"Welcome to Sandy" = "Добро пожаловать в Sandy";
+"Hover over the notch or press %@ to open Sandy." = "Наведите курсор на вырез или нажмите %@, чтобы открыть Sandy.";
+"Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them." = "В настройках выберите нужные вкладки и включите мониторинг локальных сессий Claude Code или Codex. Разрешения запрашиваются только при включении соответствующих функций.";
+"Set Up in Settings" = "Настроить в параметрах";
+"Start Using Sandy" = "Начать работу";
 "Show in Panel" = "Показывать в панели";
 "Displays" = "Дисплеи";
 "Show on All Displays" = "Показывать на всех дисплеях";
@@ -269,3 +274,42 @@
 "Completion Glow" = "Свечение при завершении";
 "The notch lights up briefly when an agent finishes a response." = "Вырез ненадолго подсвечивается, когда агент заканчивает ответ.";
 "Open in Editor" = "Открыть в редакторе";
+
+"Accent Color" = "Цвет акцента";
+"Animations" = "Анимации";
+"Close Delay" = "Задержка закрытия";
+"Diagnostics" = "Диагностика";
+"Mobile Approvals" = "Мобильные подтверждения";
+"Move Down" = "Переместить вниз";
+"Move Up" = "Переместить вверх";
+"Needs attention" = "Требует внимания";
+"Not connected" = "Не подключено";
+"Panel Size" = "Размер панели";
+"Personalization" = "Персонализация";
+"Profiles" = "Профили";
+"Refresh Diagnostics" = "Обновить диагностику";
+"Hover" = "Наведение";
+"Click" = "Щелчок";
+"Shortcut" = "Сочетание клавиш";
+"Work" = "Работа";
+"Meetings" = "Встречи";
+"Focus" = "Фокус";
+"Compact" = "Компактный";
+"Regular" = "Обычный";
+"Large" = "Большой";
+"Mint" = "Мятный";
+"Blue" = "Синий";
+"Purple" = "Фиолетовый";
+"Orange" = "Оранжевый";
+"Connected" = "Подключено";
+
+"Waiting" = "Ждёт ввода";
+"Ended" = "Завершён";
+"Failed" = "Ошибка";
+"Pinned" = "Закрепить";
+
+"Calendar Permission" = "Доступ к календарю";
+"Notifications" = "Уведомления";
+"Not requested" = "Не запрашивалось";
+"Allowed" = "Разрешено";
+"Blocked" = "Заблокировано";

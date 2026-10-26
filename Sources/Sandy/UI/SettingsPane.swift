@@ -28,6 +28,8 @@ struct SettingsPane: View {
             VStack(alignment: .leading, spacing: 14) {
                 section(localized("General")) {
                     LanguageShortcutSettingsPane()
+                    behaviorRow
+                    closeDelayRow
                     toggleRow(
                         symbol: "arrow.forward.to.line",
                         title: localized("Launch at Login"),
@@ -48,11 +50,54 @@ struct SettingsPane: View {
                 // there only as long as whoever never uses it can take it off —
                 // and off means quiet too: its background stops with the icon.
                 section(localized("Show in Panel")) {
-                    ForEach(NotchViewModel.Tab.leftRail + NotchViewModel.Tab.rightRail) { tab in
+                    ForEach(vm.orderedTabs) { tab in
                         if tab.canHide {
-                            toggleRow(symbol: tab.symbol, title: tab.title, isOn: visibilityBinding(tab))
+                            tabOrderRow(tab)
                         }
                     }
+                }
+
+                section(localized("Profiles")) {
+                    HStack(spacing: 6) {
+                        ForEach(["Work", "Meetings", "Focus"], id: \.self) { profile in
+                            Button { config.applyProfile(profile) } label: {
+                                Text(localized(profile))
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(config.activeProfile == profile ? .white : Theme.secondary)
+                                    .padding(.horizontal, 9).padding(.vertical, 5)
+                                    .background(Capsule().fill(config.activeProfile == profile ? Theme.surfaceHover : .clear))
+                            }.buttonStyle(.plain)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+
+                section(localized("Personalization")) {
+                    stringOptionRow(symbol: "rectangle.expand.vertical", title: localized("Panel Size"), options: ["compact", "regular", "large"], current: config.panelScale.rawValue) {
+                        config.setPanelScale(PanelScale(rawValue: $0) ?? .regular)
+                    }
+                    HStack(spacing: 7) {
+                        Text(localized("Accent Color")).font(.system(size: 11, weight: .medium)).foregroundStyle(.white)
+                        Spacer()
+                        ForEach(["mint", "blue", "purple", "orange"], id: \.self) { color in
+                            Button { config.setAccent(color) } label: {
+                                Circle().fill(accentColor(color)).frame(width: 14, height: 14)
+                                    .overlay(Circle().stroke(config.accent == color ? .white : .clear, lineWidth: 1.5).padding(-3))
+                            }.buttonStyle(.plain).accessibilityLabel(localized(color.capitalized))
+                        }
+                    }.padding(.horizontal, 8).frame(height: 26)
+                    toggleRow(symbol: "sparkles", title: localized("Animations"), isOn: Binding(
+                        get: { config.animationsEnabled }, set: { config.setAnimationsEnabled($0) }
+                    ))
+                }
+
+                section(localized("Diagnostics")) {
+                    diagnosticRow(localized("Configuration"), status: config.fileBroken ? localized("Needs attention") : localized("Ready"), ok: !config.fileBroken)
+                    diagnosticRow(localized("Agent Monitoring"), status: vm.agents.connectionMessage, ok: vm.agents.connection == .running)
+                    diagnosticRow(localized("Notifications"), status: vm.agents.notificationStatus, ok: vm.agents.preferences.notificationsEnabled)
+                    diagnosticRow(localized("Calendar Permission"), status: calendarPermissionTitle, ok: vm.calendar.access == .granted || vm.calendar.access == .notRequested)
+                    diagnosticRow(localized("Mobile Approvals"), status: MobileLinkStore.shared.enabled ? MobileLinkStore.shared.status : localized("Not connected"), ok: MobileLinkStore.shared.enabled)
+                    actionRow(symbol: "arrow.clockwise", title: localized("Refresh Diagnostics")) { vm.agents.retry() }
                 }
 
                 section(localized("Displays")) {
@@ -332,6 +377,95 @@ struct SettingsPane: View {
         }
         .padding(.horizontal, 8)
         .frame(height: 26)
+    }
+
+    private func stringOptionRow(
+        symbol: String, title: String, options: [String], current: String, set: @escaping (String) -> Void
+    ) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: symbol).font(.system(size: 11)).foregroundStyle(Theme.secondary).frame(width: 16)
+            Text(title).font(.system(size: 11, weight: .medium)).foregroundStyle(.white)
+            Spacer(minLength: 4)
+            ForEach(options, id: \.self) { option in
+                Button { set(option) } label: {
+                    Text(localized(option.capitalized)).font(.system(size: 9, weight: .medium))
+                        .foregroundStyle(current == option ? .white : Theme.secondary)
+                        .padding(.horizontal, 6).padding(.vertical, 4)
+                        .background(Capsule().fill(current == option ? Theme.surfaceHover : .clear))
+                }.buttonStyle(.plain)
+            }
+        }.padding(.horizontal, 8).frame(height: 27)
+    }
+
+    private var behaviorRow: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "cursorarrow").foregroundStyle(Theme.secondary).frame(width: 16)
+            Text(localized("Open Panel")).font(.system(size: 11.5, weight: .medium)).foregroundStyle(.white)
+            Spacer(minLength: 2)
+            ForEach(PanelOpenBehavior.allCases, id: \.self) { mode in
+                Button { config.setOpenBehavior(mode) } label: {
+                    Text(localized(mode.rawValue.capitalized)).font(.system(size: 9.5, weight: .medium))
+                        .foregroundStyle(config.openBehavior == mode ? .white : Theme.secondary)
+                        .padding(.horizontal, 7).padding(.vertical, 4)
+                        .background(Capsule().fill(config.openBehavior == mode ? Theme.surfaceHover : .clear))
+                }.buttonStyle(.plain)
+            }
+        }.padding(.horizontal, 8).frame(height: 28)
+    }
+
+    private var closeDelayRow: some View {
+        HStack(spacing: 8) {
+            Text(localized("Close Delay")).font(.system(size: 11, weight: .medium)).foregroundStyle(.white)
+            Slider(value: Binding(get: { config.closeDelay }, set: { config.closeDelayValue = $0 }), in: 0...2, step: 0.25)
+            Text(String(format: "%.2fs", config.closeDelay)).font(.system(size: 9, design: .monospaced)).foregroundStyle(Theme.secondary).frame(width: 38)
+        }.padding(.horizontal, 8).frame(height: 26)
+    }
+
+    private func tabOrderRow(_ tab: NotchViewModel.Tab) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: tab.symbol)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(Theme.secondary)
+                .frame(width: 16)
+            Text(tab.title).font(.system(size: 11.5, weight: .medium)).foregroundStyle(.white)
+            Spacer(minLength: 2)
+            Button { vm.moveTab(tab, by: -1) } label: { Image(systemName: "chevron.up") }
+                .disabled(vm.orderedTabs.first == tab).help(localized("Move Up"))
+            Button { vm.moveTab(tab, by: 1) } label: { Image(systemName: "chevron.down") }
+                .disabled(vm.orderedTabs.last == tab).help(localized("Move Down"))
+            Toggle("", isOn: visibilityBinding(tab)).labelsHidden().toggleStyle(NotchToggleStyle())
+        }
+        .padding(.horizontal, 8)
+        .frame(height: 28)
+        .buttonStyle(.plain)
+        .foregroundStyle(Theme.secondary)
+        .font(.system(size: 9))
+    }
+
+    private func diagnosticRow(_ title: String, status: String, ok: Bool) -> some View {
+        HStack(spacing: 7) {
+            Circle().fill(ok ? Color.green : Color.orange).frame(width: 6, height: 6)
+            Text(title).font(.system(size: 10.5, weight: .medium)).foregroundStyle(.white)
+            Spacer(minLength: 4)
+            Text(status).font(.system(size: 9)).foregroundStyle(ok ? Theme.secondary : Color.orange).lineLimit(1)
+        }.padding(.horizontal, 8).frame(height: 24)
+    }
+
+    private func accentColor(_ name: String) -> Color {
+        switch name {
+        case "blue": .cyan
+        case "purple": .purple
+        case "orange": .orange
+        default: .mint
+        }
+    }
+
+    private var calendarPermissionTitle: String {
+        switch vm.calendar.access {
+        case .notRequested: localized("Not requested")
+        case .granted: localized("Allowed")
+        case .denied: localized("Blocked")
+        }
     }
 
     private var clearTitle: String {

@@ -6,6 +6,7 @@ struct NotchContentView: View {
     /// here; everything shown is in `vm`, the same on every display.
     @ObservedObject var panel: PanelState
     @ObservedObject private var language = LanguageSettings.shared
+    @ObservedObject private var config = ConfigStore.shared
 
     private var isOpen: Bool { panel.isActive }
     private var size: CGSize { panel.bodySize }
@@ -67,22 +68,20 @@ struct NotchContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .animation(Theme.openAnimation, value: isOpen)
         .animation(Theme.paneAnimation, value: vm.tab)
+        .transaction { if !config.animationsEnabled { $0.animation = nil } }
         .environment(\.locale, language.locale)
         .onChange(of: language.selection) { _, _ in vm.agents.refreshNotificationAuthorization() }
     }
 
     // MARK: - Header
     //
-    // This strip sits directly on top of the menu bar. Menu bar utilities such
-    // as Ice watch for clicks there with a global event monitor — a passive
-    // observer that sees the click no matter which window consumes it — so
-    // clicking here toggles them as a side effect. Nothing interactive goes in
-    // this row; the tab switcher lives in the rail below.
+    // The strip shares a line with the tab switcher so the controls sit level
+    // with the title. The tab switcher is only interactive in the open panel.
 
     private var header: some View {
         HStack(spacing: 0) {
             if isOpen {
-                Text(vm.tab.title.uppercased())
+                Text(vm.showFirstRunSetup ? localized("Welcome to Sandy").uppercased() : vm.tab.title.uppercased())
                     .font(.system(size: 9, weight: .semibold))
                     .tracking(0.8)
                     .foregroundStyle(Theme.tertiary)
@@ -156,22 +155,26 @@ struct NotchContentView: View {
 
     // MARK: - Body
 
+    @ViewBuilder
     private var content: some View {
-        HStack(spacing: 14) {
-            Rail(vm: vm, panel: panel, tabs: vm.leftRail)
-            panes
-            Rail(vm: vm, panel: panel, tabs: vm.rightRail)
+        Group {
+            if vm.showFirstRunSetup {
+                FirstRunSetupPane(panel: panel)
+            } else {
+                VStack(spacing: 8) {
+                    TabSwitcher(vm: vm, panel: panel, tabs: vm.visibleTabs)
+                    panes
+                }
+            }
         }
         .padding(.horizontal, 14)
-        // The body's height is measured from this same number, so the two
-        // cannot drift apart into a rail that does not fit.
         .padding(.bottom, NotchGeometry.bodyBottomPadding)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var panes: some View {
-        // Content is replaced in place — no travel. The rail is vertical and
-        // the panes are unrelated, so a direction would only be decoration.
+        // Content is replaced in place — no travel. The tabs sit above the
+        // pane, so a direction would only be decoration.
         ZStack {
             pane
                 .id(vm.tab)
@@ -219,6 +222,52 @@ struct NotchContentView: View {
     }
 }
 
+private struct FirstRunSetupPane: View {
+    @ObservedObject var panel: PanelState
+    @ObservedObject private var config = ConfigStore.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(localized("Welcome to Sandy"))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.white)
+
+            Text(localized("Hover over the notch or press %@ to open Sandy.", config.panelShortcut.title))
+                .font(.system(size: 11.5))
+                .foregroundStyle(Theme.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(localized("Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them."))
+                .font(.system(size: 11.5))
+                .foregroundStyle(Theme.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 2)
+
+            HStack(spacing: 10) {
+                Spacer(minLength: 0)
+                Button(localized("Start Using Sandy")) {
+                    panel.finishFirstRunSetup?(false)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Theme.secondary)
+
+                Button(localized("Set Up in Settings")) {
+                    panel.finishFirstRunSetup?(true)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 11)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(Theme.surfaceHover))
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+}
+
 /// Watches the note store itself rather than reading through the view model:
 /// notes are born and deleted inside the pane while this counter is on
 /// screen, and the view model deliberately does not forward keystroke-driven
@@ -250,17 +299,17 @@ private struct CurrencyRateDate: View {
     }
 }
 
-/// Tab switcher.
+/// Horizontal tab switcher along the top of the open panel.
 ///
 /// Hovering switches tabs, but only after the pointer has stopped: a pointer
 /// crossing the rail on its way somewhere else is gone in a few dozen
 /// milliseconds, while one that came to choose stays put. The same dwell
 /// threshold is what separates "the mouse was flung across the top of the
 /// screen" from "the mouse came to the notch" in `PointerWatcher`.
-private struct Rail: View {
+private struct TabSwitcher: View {
     @ObservedObject var vm: NotchViewModel
     @ObservedObject var panel: PanelState
-    /// Which icons this rail carries — there are two rails now, one per side.
+    /// Tabs currently enabled in Settings.
     let tabs: [NotchViewModel.Tab]
 
     @State private var hovered: NotchViewModel.Tab?
@@ -270,43 +319,12 @@ private struct Rail: View {
     private let dwell = Duration.milliseconds(150)
 
     var body: some View {
-        VStack(spacing: NotchGeometry.railSpacing) {
-            ForEach(tabs) { tab in
-                Button {
-                    panel.select(tab)
-                } label: {
-                    Image(systemName: tab.symbol)
-                        .font(.system(size: 12, weight: .medium))
-                        .frame(width: 30, height: panel.geometry.railIconHeight)
-                        .background(
-                            RoundedRectangle(cornerRadius: 7, style: .continuous)
-                                .fill(fill(for: tab))
-                        )
-                        .foregroundStyle(vm.tab == tab ? Color.white : Theme.tertiary)
-                        .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-                        // A render-time transform. Growing the frame instead
-                        // would re-lay out the rail on every hover, and layout
-                        // that runs on pointer movement is exactly the kind
-                        // that shows up as a stutter.
-                        .scaleEffect(hovered == tab ? 1.15 : 1)
-                }
-                .buttonStyle(.plain)
-                .onHover { inside in
-                    if inside {
-                        hovered = tab
-                    } else if hovered == tab {
-                        hovered = nil
-                    }
-                }
-            }
+        HStack(spacing: 4) {
+            Spacer(minLength: 0)
+            buttons
+            Spacer(minLength: 0)
         }
-        .frame(width: 30)
-        // Centred in the height an ordinary tab has, then that block pinned to
-        // the top of whatever height this tab actually got. On the eight normal
-        // tabs the two are the same and nothing moves; on the teleprompter the
-        // extra 192 pt goes to the script below, and the icons stay put.
-        .frame(height: panel.geometry.standardContentHeight, alignment: .center)
-        .frame(maxHeight: .infinity, alignment: .top)
+        .frame(height: 28)
         .animation(Theme.contentAnimation, value: hovered)
         // Moving to another icon cancels the pending switch along with the
         // task, so only the icon actually rested on ever wins.
@@ -318,8 +336,47 @@ private struct Rail: View {
         }
     }
 
+    @ViewBuilder
+    private var buttons: some View {
+        ForEach(tabs) { tab in
+            Button {
+                panel.select(tab)
+            } label: {
+                Image(systemName: tab.symbol)
+                    .font(.system(size: 12, weight: .medium))
+                    .frame(width: 32, height: 28)
+                    .background(
+                        RoundedRectangle(cornerRadius: 7, style: .continuous)
+                            .fill(fill(for: tab))
+                    )
+                    .foregroundStyle(vm.tab == tab ? Color.white : Theme.tertiary)
+                    .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    .scaleEffect(hovered == tab ? 1.15 : 1)
+            }
+            .buttonStyle(.plain)
+            .help(tab.title)
+            .accessibilityLabel(tab.title)
+            .onHover { inside in
+                if inside {
+                    hovered = tab
+                } else if hovered == tab {
+                    hovered = nil
+                }
+            }
+        }
+    }
+
     private func fill(for tab: NotchViewModel.Tab) -> Color {
-        if vm.tab == tab { return Theme.surfaceHover }
+        if vm.tab == tab { return accentColor }
         return hovered == tab ? Theme.surface : .clear
+    }
+
+    private var accentColor: Color {
+        switch ConfigStore.shared.accent {
+        case "blue": .cyan
+        case "purple": .purple
+        case "orange": .orange
+        default: .mint
+        }
     }
 }

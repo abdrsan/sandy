@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentSessionState: String, Codable, Sendable {
+enum AgentSessionState: String, CaseIterable, Codable, Sendable {
     case idle, working, waiting, ready, ended, failed, disconnected
 }
 

@@ -13,21 +13,16 @@ struct NotchGeometry {
     /// True when a notch we drew keeps the full menu bar height while
     /// collapsed, the way it used to. Off by default — see `collapsedDepth`.
     let drawsFullSize: Bool
+    let scale: CGFloat
 
-    /// Metrics of the tab rail that do not depend on the notch. `railIconHeight`
-    /// is not among them — see below.
-    static let railSpacing: CGFloat = 4
-    /// Gap between the rail and the bottom edge of the body.
+    /// Gap beneath the content at the bottom of the body.
     static let bodyBottomPadding: CGFloat = 14
 
-    /// Size of the fully expanded panel body. Held constant across every Mac:
-    /// letting it follow the header made two people on the very same model
-    /// see two different heights, just from different display-scaling
-    /// settings — 38 pt against 32 for the same physical notch, an 11 pt
-    /// spread from one slider (#27). What differs between Macs lives in
-    /// `railIconHeight` instead, which is the one thing in the body actually
-    /// free to give.
-    let expandedSize = CGSize(width: 620, height: 208)
+    /// Standard panel body. The additional height accommodates a horizontal
+    /// tab bar while preserving the content area's previous height.
+    var expandedSize: CGSize {
+        return CGSize(width: 620 * scale, height: 244 * scale)
+    }
 
     /// Body for the teleprompter, the one tab that asks for more.
     ///
@@ -36,41 +31,14 @@ struct NotchGeometry {
     /// it. The height is the smallest that fits a paragraph at a size readable
     /// without focusing: below this the tab shows the current line and the next
     /// one, which is a countdown, not a script.
-    static let tallBodyHeight: CGFloat = 400
+    var tallBodyHeight: CGFloat { 436 * scale }
     var tallExpandedSize: CGSize {
-        CGSize(width: expandedSize.width, height: Self.tallBodyHeight)
+        CGSize(width: expandedSize.width, height: tallBodyHeight)
     }
     /// Tallest body any tab can ask for. The window is cut to this once and
     /// never resized: it is transparent outside the visible panel, and what is
     /// clickable is decided separately by the active rect.
-    var maxBodyHeight: CGFloat { max(expandedSize.height, Self.tallBodyHeight) }
-
-    /// What the body has left for content on an ordinary tab, once the header
-    /// and the padding beneath are taken out.
-    ///
-    /// The rails are held to this even on the tab that is taller, so the icons
-    /// stay at the same height on every tab. Centred in the body instead, they
-    /// slid down by half the difference — 96 pt — the moment the teleprompter
-    /// opened, which put the icon just clicked well below the pointer that had
-    /// clicked it.
-    var standardContentHeight: CGFloat {
-        expandedSize.height - notchSize.height - Self.bodyBottomPadding
-    }
-
-    /// Height each rail icon gets. A ceiling, not a constant: six icons at
-    /// the full 24 pt plus the five 4 pt gaps between them is 164 pt, and
-    /// the body only has `expandedSize.height − notchSize.height −
-    /// bodyBottomPadding` left to give the rail once the header — the notch
-    /// itself — and the padding beneath are taken out of the fixed 208.
-    /// Rounded down rather than to the nearest point: a rail that asks for
-    /// more than it is given should visibly yield, not overflow by a
-    /// fraction that clips it.
-    var railIconHeight: CGFloat {
-        let icons = CGFloat(NotchViewModel.Tab.leftRail.count)
-        let available = expandedSize.height - notchSize.height - Self.bodyBottomPadding
-        let ceiling = (available - (icons - 1) * Self.railSpacing) / icons
-        return min(24, ceiling).rounded(.down)
-    }
+    var maxBodyHeight: CGFloat { max(expandedSize.height, tallBodyHeight) }
 
     /// Slack around the panel so the concave shoulders and shadow are not clipped.
     let windowPadding = NSEdgeInsets(top: 0, left: 40, bottom: 44, right: 40)
@@ -127,7 +95,9 @@ struct NotchGeometry {
         return screens.map { current(on: $0, drawsFullSize: fullSize) }
     }
 
+    @MainActor
     static func current(on screen: NSScreen, drawsFullSize: Bool) -> NotchGeometry {
+        let scale = ConfigStore.shared.panelScale.factor
         if screen.safeAreaInsets.top > 0,
            let left = screen.auxiliaryTopLeftArea,
            let right = screen.auxiliaryTopRightArea {
@@ -137,7 +107,8 @@ struct NotchGeometry {
                 notchSize: CGSize(width: width, height: screen.safeAreaInsets.top),
                 notchCenterX: screen.frame.minX + left.width + width / 2,
                 isPhysical: true,
-                drawsFullSize: false
+                drawsFullSize: false,
+                scale: scale
             )
         }
 
@@ -159,7 +130,8 @@ struct NotchGeometry {
             notchSize: CGSize(width: 180, height: max(menuBarHeight, NSStatusBar.system.thickness, 24)),
             notchCenterX: screen.frame.midX,
             isPhysical: false,
-            drawsFullSize: drawsFullSize
+            drawsFullSize: drawsFullSize,
+            scale: scale
         )
     }
 
@@ -173,6 +145,8 @@ struct NotchGeometry {
             && notchCenterX == other.notchCenterX
             && isPhysical == other.isPhysical
             && drawsFullSize == other.drawsFullSize
+            && expandedSize == other.expandedSize
+            && scale == other.scale
     }
 
     // MARK: - Derived frames
@@ -281,7 +255,8 @@ struct NotchGeometry {
     var expandedHoverRect: CGRect { hoverRect(for: expandedSize) }
 
     /// Taken for the body actually on screen, not for the standard one: on the
-    /// teleprompter the panel reaches 400 pt down, and a rect cut for 208 would
+    /// teleprompter the panel reaches its full height, and a rect cut for a
+    /// standard tab would
     /// call the pointer "away" halfway through the tab it is resting on.
     func hoverRect(for body: CGSize) -> CGRect {
         includingTopEdge(CGRect(

@@ -1,5 +1,16 @@
 import AppKit
 
+enum PanelOpenBehavior: String, CaseIterable, Codable {
+    case hover, click, shortcut
+}
+
+enum PanelScale: String, CaseIterable, Codable {
+    case compact, regular, large
+    var factor: CGFloat {
+        switch self { case .compact: 0.9; case .regular: 1; case .large: 1.12 }
+    }
+}
+
 /// Everything about Sandy that makes sense on somebody else's Mac, in one
 /// file next to `snippets.json` and `notes.json` (#67).
 ///
@@ -31,6 +42,14 @@ final class ConfigStore: ObservableObject {
         var privacy: [String] = []
         var teleprompter = Teleprompter()
         var hiddenTabs: [String] = []
+        var tabOrder: [String] = []
+        var openBehavior = PanelOpenBehavior.hover.rawValue
+        var closeDelay = 0.25
+        var panelScale = PanelScale.regular.rawValue
+        var accent = "mint"
+        var animationsEnabled = true
+        var activeProfile = "Custom"
+        var onboardingComplete = true
         var fullSizeDrawnNotch = false
         var panelShortcutEnabled = true
         var panelShortcut = PanelShortcut.controlOptionSpace
@@ -60,6 +79,14 @@ final class ConfigStore: ObservableObject {
             privacy = try c.decodeIfPresent([String].self, forKey: .privacy) ?? d.privacy
             teleprompter = try c.decodeIfPresent(Teleprompter.self, forKey: .teleprompter) ?? d.teleprompter
             hiddenTabs = try c.decodeIfPresent([String].self, forKey: .hiddenTabs) ?? d.hiddenTabs
+            tabOrder = try c.decodeIfPresent([String].self, forKey: .tabOrder) ?? d.tabOrder
+            openBehavior = try c.decodeIfPresent(String.self, forKey: .openBehavior) ?? d.openBehavior
+            closeDelay = try c.decodeIfPresent(Double.self, forKey: .closeDelay) ?? d.closeDelay
+            panelScale = try c.decodeIfPresent(String.self, forKey: .panelScale) ?? d.panelScale
+            accent = try c.decodeIfPresent(String.self, forKey: .accent) ?? d.accent
+            animationsEnabled = try c.decodeIfPresent(Bool.self, forKey: .animationsEnabled) ?? d.animationsEnabled
+            activeProfile = try c.decodeIfPresent(String.self, forKey: .activeProfile) ?? d.activeProfile
+            onboardingComplete = try c.decodeIfPresent(Bool.self, forKey: .onboardingComplete) ?? d.onboardingComplete
             fullSizeDrawnNotch = try c.decodeIfPresent(Bool.self, forKey: .fullSizeDrawnNotch) ?? d.fullSizeDrawnNotch
             panelShortcutEnabled = try c.decodeIfPresent(Bool.self, forKey: .panelShortcutEnabled) ?? d.panelShortcutEnabled
             let shortcut = try c.decodeIfPresent(String.self, forKey: .panelShortcut)
@@ -87,6 +114,12 @@ final class ConfigStore: ObservableObject {
     /// honest, and writing stops rather than paving over a hand edit gone
     /// wrong.
     @Published private(set) var fileBroken = false
+    @Published private(set) var onboardingComplete = true
+    @Published private(set) var openBehavior = PanelOpenBehavior.hover
+    @Published private(set) var panelScale = PanelScale.regular
+    @Published private(set) var accent = "mint"
+    @Published private(set) var animationsEnabled = true
+    @Published private(set) var closeDelay = 0.25
 
     private var value: File
 
@@ -103,8 +136,15 @@ final class ConfigStore: ObservableObject {
             // Nothing on disk yet, so nothing to protect — assembled from
             // whatever the old keys already say and written straight away.
             value = Self.migrated()
+            value.onboardingComplete = false
             write(value)
         }
+        onboardingComplete = value.onboardingComplete
+        openBehavior = PanelOpenBehavior(rawValue: value.openBehavior) ?? .hover
+        panelScale = PanelScale(rawValue: value.panelScale) ?? .regular
+        accent = value.accent
+        animationsEnabled = value.animationsEnabled
+        closeDelay = value.closeDelay
     }
 
     // MARK: - Settings
@@ -155,6 +195,78 @@ final class ConfigStore: ObservableObject {
     var hiddenTabs: [String] {
         get { value.hiddenTabs }
         set { value.hiddenTabs = newValue; persist() }
+    }
+
+    var tabOrder: [String] {
+        get { value.tabOrder }
+        set { value.tabOrder = newValue; persist() }
+    }
+
+    var closeDelayValue: Double {
+        get { value.closeDelay }
+        set {
+            value.closeDelay = min(2, max(0, newValue))
+            closeDelay = value.closeDelay
+            persist()
+            NotificationCenter.default.post(name: NotchGeometry.settingsChanged, object: nil)
+        }
+    }
+
+    func setOpenBehavior(_ behavior: PanelOpenBehavior) {
+        value.openBehavior = behavior.rawValue
+        openBehavior = behavior
+        persist()
+        NotificationCenter.default.post(name: NotchGeometry.settingsChanged, object: nil)
+    }
+
+    func setPanelScale(_ scale: PanelScale) {
+        value.panelScale = scale.rawValue
+        panelScale = scale
+        persist()
+        NotificationCenter.default.post(name: NotchGeometry.settingsChanged, object: nil)
+    }
+
+    func setAccent(_ color: String) {
+        value.accent = color
+        accent = color
+        persist()
+        objectWillChange.send()
+    }
+
+    func setAnimationsEnabled(_ enabled: Bool) {
+        value.animationsEnabled = enabled
+        animationsEnabled = enabled
+        persist()
+    }
+
+    func applyProfile(_ name: String) {
+        let profile: [NotchViewModel.Tab]
+        switch name {
+        case "Work": profile = [.agents, .clipboard, .notes, .snippets, .calendar, .settings]
+        case "Meetings": profile = [.calendar, .notes, .translate, .agents, .settings]
+        case "Focus": profile = [.media, .teleprompter, .notes, .settings]
+        default: return
+        }
+        value.hiddenTabs = NotchViewModel.Tab.allCases.filter { $0.canHide && !profile.contains($0) }.map(\.rawValue)
+        value.tabOrder = profile.map(\.rawValue)
+        value.activeProfile = name
+        persist()
+        NotificationCenter.default.post(name: .sandyApplyProfile, object: nil)
+    }
+
+    var activeProfile: String { value.activeProfile }
+
+    func markProfileCustom() {
+        guard value.activeProfile != "Custom" else { return }
+        value.activeProfile = "Custom"
+        persist()
+    }
+
+    func completeOnboarding() {
+        guard !onboardingComplete else { return }
+        value.onboardingComplete = true
+        onboardingComplete = true
+        persist()
     }
 
     var agentMonitor: AgentMonitorPreferences {
@@ -296,4 +408,8 @@ final class ConfigStore: ObservableObject {
         }
         NSWorkspace.shared.activateFileViewerSelecting([file])
     }
+}
+
+extension Notification.Name {
+    static let sandyApplyProfile = Notification.Name("SandyApplyProfile")
 }

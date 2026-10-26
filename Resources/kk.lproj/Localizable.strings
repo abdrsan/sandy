@@ -15,6 +15,11 @@
 "General" = "Жалпы";
 "Launch at Login" = "Жүйеге кіргенде іске қосу";
 "Show Menu Bar Icon" = "Мәзір жолағында белгішені көрсету";
+"Welcome to Sandy" = "Sandy қолданбасына қош келдіңіз";
+"Hover over the notch or press %@ to open Sandy." = "Sandy қолданбасын ашу үшін ойыққа апарыңыз немесе %@ пернелерін басыңыз.";
+"Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them." = "Баптаулардан қажетті қойындыларды таңдап, жергілікті Claude Code немесе Codex сессияларын бақылауды қосыңыз. Рұқсаттар функцияға қажет болғанда ғана сұралады.";
+"Set Up in Settings" = "Баптауларда реттеу";
+"Start Using Sandy" = "Sandy қолдануды бастау";
 "Show in Panel" = "Панельде көрсету";
 "Displays" = "Экрандар";
 "Show on All Displays" = "Барлық экранда көрсету";
@@ -232,3 +237,42 @@
 "Completion Glow" = "Аяқтау жылтылығы";
 "The notch lights up briefly when an agent finishes a response." = "Агент жауапты аяқтағанда вырез бірнеше секунд жылтырайды.";
 "Open in Editor" = "Редакторда ашу";
+
+"Accent Color" = "Акцент түсі";
+"Animations" = "Анимациялар";
+"Close Delay" = "Жабылу кідірісі";
+"Diagnostics" = "Диагностика";
+"Mobile Approvals" = "Мобильді растаулар";
+"Move Down" = "Төмен жылжыту";
+"Move Up" = "Жоғары жылжыту";
+"Needs attention" = "Назар аудару қажет";
+"Not connected" = "Қосылмаған";
+"Panel Size" = "Панель өлшемі";
+"Personalization" = "Даралау";
+"Profiles" = "Профильдер";
+"Refresh Diagnostics" = "Диагностиканы жаңарту";
+"Hover" = "Меңзермен апару";
+"Click" = "Басу";
+"Shortcut" = "Пернетақта тіркесімі";
+"Work" = "Жұмыс";
+"Meetings" = "Кездесулер";
+"Focus" = "Фокус";
+"Compact" = "Шағын";
+"Regular" = "Қалыпты";
+"Large" = "Үлкен";
+"Mint" = "Жалбыз түсті";
+"Blue" = "Көк";
+"Purple" = "Күлгін";
+"Orange" = "Қызғылт сары";
+"Connected" = "Қосылған";
+
+"Waiting" = "Енгізуді күтуде";
+"Ended" = "Аяқталды";
+"Failed" = "Қате";
+"Pinned" = "Бекіту";
+
+"Calendar Permission" = "Күнтізбеге рұқсат";
+"Notifications" = "Хабарландырулар";
+"Not requested" = "Сұралмаған";
+"Allowed" = "Рұқсат етілген";
+"Blocked" = "Бұғатталған";

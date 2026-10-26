@@ -15,6 +15,11 @@
 "General" = "Allgemein";
 "Launch at Login" = "Bei Anmeldung starten";
 "Show Menu Bar Icon" = "Symbol in der Menüleiste zeigen";
+"Welcome to Sandy" = "Willkommen bei Sandy";
+"Hover over the notch or press %@ to open Sandy." = "Bewege den Zeiger auf die Aussparung oder drücke %@, um Sandy zu öffnen.";
+"Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them." = "Wähle in den Einstellungen die gewünschten Tabs und aktiviere die Überwachung lokaler Claude-Code- oder Codex-Sitzungen. Berechtigungen werden nur angefragt, wenn eine Funktion sie benötigt.";
+"Set Up in Settings" = "In den Einstellungen einrichten";
+"Start Using Sandy" = "Sandy verwenden";
 "Show in Panel" = "Im Panel anzeigen";
 "Displays" = "Bildschirme";
 "Show on All Displays" = "Auf allen Bildschirmen anzeigen";
@@ -232,3 +237,42 @@
 "Completion Glow" = "Abschluss-Leuchten";
 "The notch lights up briefly when an agent finishes a response." = "Die Notch leuchtet kurz auf, wenn ein Agent eine Antwort beendet.";
 "Open in Editor" = "In Editor öffnen";
+
+"Accent Color" = "Akzentfarbe";
+"Animations" = "Animationen";
+"Close Delay" = "Schließverzögerung";
+"Diagnostics" = "Diagnose";
+"Mobile Approvals" = "Mobile Freigaben";
+"Move Down" = "Nach unten";
+"Move Up" = "Nach oben";
+"Needs attention" = "Achtung erforderlich";
+"Not connected" = "Nicht verbunden";
+"Panel Size" = "Panelgröße";
+"Personalization" = "Personalisierung";
+"Profiles" = "Profile";
+"Refresh Diagnostics" = "Diagnose aktualisieren";
+"Hover" = "Darüberfahren";
+"Click" = "Klick";
+"Shortcut" = "Tastenkürzel";
+"Work" = "Arbeit";
+"Meetings" = "Besprechungen";
+"Focus" = "Fokus";
+"Compact" = "Kompakt";
+"Regular" = "Normal";
+"Large" = "Groß";
+"Mint" = "Mint";
+"Blue" = "Blau";
+"Purple" = "Lila";
+"Orange" = "Orange";
+"Connected" = "Verbunden";
+
+"Waiting" = "Wartet auf Eingabe";
+"Ended" = "Beendet";
+"Failed" = "Fehler";
+"Pinned" = "Anheften";
+
+"Calendar Permission" = "Kalenderzugriff";
+"Notifications" = "Mitteilungen";
+"Not requested" = "Nicht angefragt";
+"Allowed" = "Erlaubt";
+"Blocked" = "Blockiert";

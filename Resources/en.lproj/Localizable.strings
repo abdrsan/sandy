@@ -22,6 +22,11 @@
 "General" = "General";
 "Launch at Login" = "Launch at Login";
 "Show Menu Bar Icon" = "Show Menu Bar Icon";
+"Welcome to Sandy" = "Welcome to Sandy";
+"Hover over the notch or press %@ to open Sandy." = "Hover over the notch or press %@ to open Sandy.";
+"Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them." = "Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them.";
+"Set Up in Settings" = "Set Up in Settings";
+"Start Using Sandy" = "Start Using Sandy";
 "Show in Panel" = "Show in Panel";
 "Displays" = "Displays";
 "Show on All Displays" = "Show on All Displays";
@@ -270,3 +275,42 @@
 "Completion Glow" = "Completion Glow";
 "The notch lights up briefly when an agent finishes a response." = "The notch lights up briefly when an agent finishes a response.";
 "Open in Editor" = "Open in Editor";
+
+"Accent Color" = "Accent Color";
+"Animations" = "Animations";
+"Close Delay" = "Close Delay";
+"Diagnostics" = "Diagnostics";
+"Mobile Approvals" = "Mobile Approvals";
+"Move Down" = "Move Down";
+"Move Up" = "Move Up";
+"Needs attention" = "Needs attention";
+"Not connected" = "Not connected";
+"Panel Size" = "Panel Size";
+"Personalization" = "Personalization";
+"Profiles" = "Profiles";
+"Refresh Diagnostics" = "Refresh Diagnostics";
+"Hover" = "Hover";
+"Click" = "Click";
+"Shortcut" = "Shortcut";
+"Work" = "Work";
+"Meetings" = "Meetings";
+"Focus" = "Focus";
+"Compact" = "Compact";
+"Regular" = "Regular";
+"Large" = "Large";
+"Mint" = "Mint";
+"Blue" = "Blue";
+"Purple" = "Purple";
+"Orange" = "Orange";
+"Connected" = "Connected";
+
+"Waiting" = "Waiting";
+"Ended" = "Ended";
+"Failed" = "Failed";
+"Pinned" = "Pinned";
+
+"Calendar Permission" = "Calendar Permission";
+"Notifications" = "Notifications";
+"Not requested" = "Not requested";
+"Allowed" = "Allowed";
+"Blocked" = "Blocked";

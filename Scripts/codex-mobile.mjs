@@ -53,7 +53,7 @@ child.on('error',()=>{process.stderr.write('Could not start Codex. Set SANDY_COD
 child.on('exit',()=>{for(const c of cancellations.values())c.abort();if(!finished)process.exitCode=1;for(const p of pending.values())p.reject(Error('Codex exited'));});
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>{for(const c of cancellations.values())c.abort();child.kill(sig);});
 try {
- await request('initialize',{clientInfo:{name:'sandy_mobile',title:'Sandy mobile approvals',version:'0.1.0'}});send({method:'initialized',params:{}});
+ await request('initialize',{clientInfo:{name:'sandy_mobile',title:'Sandy mobile approvals',version:'0.2.0'}});send({method:'initialized',params:{}});
  const result=await request('thread/start',{cwd:process.cwd(),approvalPolicy:'unlessTrusted',sandbox:'workspaceWrite'});thread=result.thread.id;
  await request('turn/start',{threadId:thread,input:[{type:'text',text:prompt}]});
 } catch { process.stderr.write('Codex integration failed; no pending action was approved.\n');child.kill();process.exitCode=1; }

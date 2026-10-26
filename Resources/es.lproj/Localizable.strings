@@ -15,6 +15,11 @@
 "General" = "General";
 "Launch at Login" = "Abrir al iniciar sesión";
 "Show Menu Bar Icon" = "Mostrar icono en la barra de menús";
+"Welcome to Sandy" = "Te damos la bienvenida a Sandy";
+"Hover over the notch or press %@ to open Sandy." = "Pasa el cursor por la muesca o pulsa %@ para abrir Sandy.";
+"Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them." = "En Ajustes, elige las pestañas que quieras y activa la supervisión de tus sesiones locales de Claude Code o Codex. Solo se pedirán permisos cuando una función los necesite.";
+"Set Up in Settings" = "Configurar en Ajustes";
+"Start Using Sandy" = "Empezar a usar Sandy";
 "Show in Panel" = "Mostrar en el panel";
 "Displays" = "Pantallas";
 "Show on All Displays" = "Mostrar en todas las pantallas";
@@ -232,3 +237,42 @@
 "Completion Glow" = "Resplandor al terminar";
 "The notch lights up briefly when an agent finishes a response." = "La muesca se ilumina brevemente cuando un agente termina una respuesta.";
 "Open in Editor" = "Abrir en el editor";
+
+"Accent Color" = "Color de énfasis";
+"Animations" = "Animaciones";
+"Close Delay" = "Retraso al cerrar";
+"Diagnostics" = "Diagnóstico";
+"Mobile Approvals" = "Aprobaciones móviles";
+"Move Down" = "Bajar";
+"Move Up" = "Subir";
+"Needs attention" = "Requiere atención";
+"Not connected" = "Sin conexión";
+"Panel Size" = "Tamaño del panel";
+"Personalization" = "Personalización";
+"Profiles" = "Perfiles";
+"Refresh Diagnostics" = "Actualizar diagnóstico";
+"Hover" = "Al pasar";
+"Click" = "Clic";
+"Shortcut" = "Atajo";
+"Work" = "Trabajo";
+"Meetings" = "Reuniones";
+"Focus" = "Enfoque";
+"Compact" = "Compacto";
+"Regular" = "Normal";
+"Large" = "Grande";
+"Mint" = "Menta";
+"Blue" = "Azul";
+"Purple" = "Morado";
+"Orange" = "Naranja";
+"Connected" = "Conectado";
+
+"Waiting" = "Esperando entrada";
+"Ended" = "Finalizado";
+"Failed" = "Error";
+"Pinned" = "Fijar";
+
+"Calendar Permission" = "Permiso del calendario";
+"Notifications" = "Notificaciones";
+"Not requested" = "No solicitado";
+"Allowed" = "Permitido";
+"Blocked" = "Bloqueado";

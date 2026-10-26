@@ -15,6 +15,11 @@
 "General" = "一般";
 "Launch at Login" = "ログイン時に起動";
 "Show Menu Bar Icon" = "メニューバーにアイコンを表示";
+"Welcome to Sandy" = "Sandy へようこそ";
+"Hover over the notch or press %@ to open Sandy." = "ノッチにポインタを合わせるか、%@ を押して Sandy を開きます。";
+"Use Settings to choose the tabs you want and enable monitoring for local Claude Code or Codex sessions. Permissions are requested only when a feature needs them." = "設定で必要なタブを選び、ローカルの Claude Code または Codex セッションの監視を有効にしてください。権限は機能に必要な場合のみ確認します。";
+"Set Up in Settings" = "設定を開く";
+"Start Using Sandy" = "Sandy を使い始める";
 "Show in Panel" = "パネルに表示";
 "Displays" = "ディスプレイ";
 "Show on All Displays" = "すべてのディスプレイに表示";
@@ -230,3 +235,42 @@
 "Completion Glow" = "完了グロー";
 "The notch lights up briefly when an agent finishes a response." = "エージェントが応答を終えるとノッチが短く光ります。";
 "Open in Editor" = "エディタで開く";
+
+"Accent Color" = "アクセントカラー";
+"Animations" = "アニメーション";
+"Close Delay" = "閉じるまでの時間";
+"Diagnostics" = "診断";
+"Mobile Approvals" = "モバイル承認";
+"Move Down" = "下へ移動";
+"Move Up" = "上へ移動";
+"Needs attention" = "要確認";
+"Not connected" = "未接続";
+"Panel Size" = "パネルサイズ";
+"Personalization" = "カスタマイズ";
+"Profiles" = "プロファイル";
+"Refresh Diagnostics" = "診断を更新";
+"Hover" = "ホバー";
+"Click" = "クリック";
+"Shortcut" = "ショートカット";
+"Work" = "仕事";
+"Meetings" = "会議";
+"Focus" = "集中";
+"Compact" = "コンパクト";
+"Regular" = "標準";
+"Large" = "大";
+"Mint" = "ミント";
+"Blue" = "青";
+"Purple" = "紫";
+"Orange" = "オレンジ";
+"Connected" = "接続済み";
+
+"Waiting" = "入力待ち";
+"Ended" = "終了";
+"Failed" = "失敗";
+"Pinned" = "ピン留め";
+
+"Calendar Permission" = "カレンダー権限";
+"Notifications" = "通知";
+"Not requested" = "未リクエスト";
+"Allowed" = "許可済み";
+"Blocked" = "ブロック済み";

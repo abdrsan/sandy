@@ -26,6 +26,7 @@ final class NotchScreenPanel {
     private let pointer = PointerWatcher()
     private var panel: NotchPanel?
     private var rootView: NotchRootView?
+    private var hostingView: NSHostingView<NotchContentView>?
     private var cancellables = Set<AnyCancellable>()
     private var closeActiveRectWork: DispatchWorkItem?
     /// Monotonic stamp for the deferred half of closing: any newer open or
@@ -50,11 +51,19 @@ final class NotchScreenPanel {
         panel?.contentView = nil
         panel = nil
         rootView = nil
+        hostingView = nil
     }
 
     func toggle() {
         setOpen(!state.isOpen)
         pointer.setInside(state.isOpen)
+    }
+
+    func presentFirstRunSetup() {
+        guard vm.showFirstRunSetup else { return }
+        isPresentedByShortcut = true
+        setOpen(true)
+        pointer.setInside(true)
     }
 
     func toggleFromShortcut() {
@@ -115,6 +124,20 @@ final class NotchScreenPanel {
 
     private func build() {
         let panel = NotchPanel(contentRect: geometry.windowFrame)
+        state.finishFirstRunSetup = { [weak self] configure in
+            guard let self else { return }
+            ConfigStore.shared.completeOnboarding()
+            vm.showFirstRunSetup = false
+            isPresentedByShortcut = false
+            if configure {
+                vm.tab = .settings
+                setOpen(true)
+                pointer.setInside(true)
+            } else {
+                setOpen(false)
+                pointer.setInside(false)
+            }
+        }
         let root = NotchRootView(frame: CGRect(origin: .zero, size: geometry.windowSize))
         root.autoresizingMask = [.width, .height]
 
@@ -153,8 +176,21 @@ final class NotchScreenPanel {
         // Clicking away drops the keyboard but leaves the tab where it was, so
         // a click back into the panel has to be able to ask for it again.
         panel.onPress = { [weak self] in
-            guard let self, vm.clickTakesKeyboard else { return }
-            state.wantsKeyboard = true
+            guard let self else { return }
+            if ConfigStore.shared.openBehavior == .click {
+                if state.isOpen, geometry.hoverRect.contains(NSEvent.mouseLocation) {
+                    isPresentedByShortcut = false
+                    setOpen(false)
+                    pointer.setInside(false)
+                    return
+                } else if !state.isOpen {
+                    isPresentedByShortcut = true
+                    pointer.setInside(true)
+                    setOpen(true)
+                    return
+                }
+            }
+            if vm.clickTakesKeyboard { state.wantsKeyboard = true }
         }
         panel.onEscape = { [weak self] in
             guard let self, isPresentedByShortcut else { return false }
@@ -170,10 +206,11 @@ final class NotchScreenPanel {
 
         self.panel = panel
         self.rootView = root
+        self.hostingView = hosting
 
         applyActiveRect(open: false)
 
-        pointer.openRect = geometry.hoverRect
+        pointer.openRect = ConfigStore.shared.openBehavior == .hover ? geometry.hoverRect : .zero
         pointer.warmZone = geometry.warmZone
         // Cut for the tab that will be showing, not for the standard body: the
         // tab is shared, so a screen built while the teleprompter is up opens
@@ -185,6 +222,7 @@ final class NotchScreenPanel {
         // crossing them is usually on its way to one of them. There, staying
         // put is what asks for the panel.
         pointer.openDelay = geometry.isPhysical ? 0.05 : 0.2
+        pointer.closeDelay = ConfigStore.shared.closeDelay
         pointer.isDragging = { [weak root] in root?.isReceivingDrag ?? false }
         pointer.isPanelOpen = { [weak state] in state?.isOpen ?? false }
         pointer.onChange = { [weak self] inside in
@@ -206,7 +244,7 @@ final class NotchScreenPanel {
         // Switching tabs can change how far down the panel reaches, and both
         // the clickable region and the region the pointer counts as "on the
         // panel" are cut from that. Left alone, the teleprompter would open to
-        // its full height with only its top 208 pt alive.
+        // its full height with only the standard panel's area alive.
         vm.$tab
             .removeDuplicates()
             .sink { [weak self] tab in
@@ -315,6 +353,15 @@ final class NotchScreenPanel {
             // through a region the animation has not covered yet.
             applyActiveRect(open: true)
             withAnimation(Theme.openAnimation) { state.isOpen = true }
+            // The panel is a non-activating overlay above the menu bar. On
+            // some macOS window-server updates SwiftUI publishes the expanded
+            // state but AppKit does not paint it until another display event
+            // arrives (a screenshot used to trigger that event). Ask for the
+            // first frame explicitly, as collapse() already does for the last.
+            DispatchQueue.main.async { [weak self] in
+                guard let self, state.isOpen else { return }
+                refreshDisplay()
+            }
         } else {
             // The keyboard goes first and the fold goes second — one run-loop
             // pass apart, never together. Dropped in the same pass, resigning
@@ -350,9 +397,7 @@ final class NotchScreenPanel {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             panel?.releaseKey()
-            state.objectWillChange.send()
-            rootView?.needsDisplay = true
-            panel?.displayIfNeeded()
+            refreshDisplay()
         }
 
         // Shrink only once the panel has finished collapsing. Doing it
@@ -388,7 +433,7 @@ final class NotchScreenPanel {
         // notch that is deliberately shallower than the menu bar, so clicks on
         // status items underneath reach them instead of a panel nobody can see.
         // The open size is the current tab's, not a constant: the teleprompter
-        // is taller, and a rect cut for 208 would leave the bottom half of it
+        // is taller, and a rect cut for a standard tab would leave its lower half
         // visible but untouchable.
         let size = open ? state.openBodySize : geometry.collapsedSize
         var rect = geometry.contentRect(for: size)
@@ -399,8 +444,33 @@ final class NotchScreenPanel {
             rect = rect.insetBy(dx: -Theme.openTopRadius, dy: 0)
         }
         rootView.activeRect = rect
-        pointer.interactiveRect = geometry
+        let clickToOpen = !open && ConfigStore.shared.openBehavior == .click
+        pointer.interactiveRect = (clickToOpen ? geometry.hoverRect : geometry
             .contentScreenRect(for: size)
-            .insetBy(dx: open ? -Theme.openTopRadius : 0, dy: 0)
+            .insetBy(dx: open ? -Theme.openTopRadius : 0, dy: 0))
+    }
+
+    /// Explicitly invalidate the SwiftUI host as well as its containing
+    /// window. The panel is non-activating and above the menu bar; on some
+    /// displays the WindowServer can defer its visible composite even though
+    /// SwiftUI has already accepted the state change. Screen capture then
+    /// forces a fresh composite, which made content appear in screenshots
+    /// while remaining stale on the physical display.
+    private func refreshDisplay() {
+        state.objectWillChange.send()
+        hostingView?.layoutSubtreeIfNeeded()
+        hostingView?.needsDisplay = true
+        hostingView?.displayIfNeeded()
+        rootView?.needsDisplay = true
+        rootView?.displayIfNeeded()
+        panel?.display()
+        panel?.displayIfNeeded()
+        panel?.orderFrontRegardless()
+    }
+
+    func refreshInteractionSettings() {
+        pointer.openRect = ConfigStore.shared.openBehavior == .hover ? geometry.hoverRect : .zero
+        pointer.closeDelay = ConfigStore.shared.closeDelay
+        applyActiveRect(open: state.isOpen)
     }
 }
